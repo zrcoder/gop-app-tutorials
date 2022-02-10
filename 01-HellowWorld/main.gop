@@ -1,0 +1,40 @@
+import (
+	"net/http"
+
+	"github.com/hexops/vecty"
+	"github.com/hexops/vecty/elem"
+	"github.com/hexops/vecty/event"
+)
+
+type Hello struct {
+	vecty.Core
+
+	Name string
+}
+
+func (h *Hello) Render() vecty.ComponentOrHTML {
+	return elem.body(
+		elem.heading1(
+			vecty.text(h.text()),
+		),
+		elem.input(
+			vecty.markup(
+				event.change(h.onInputEnd),
+			),
+		),
+	)
+}
+
+func (h *Hello) text() string {
+	if h.Name == "" {
+		return "Hello, world!"
+	}
+	return "Hello " + h.Name + "!"
+}
+
+func (h *Hello) onInputEnd(e *vecty.Event) {
+	h.Name = e.Target.get("value").string
+	vecty.rerender(h)
+}
+
+vecty.renderBody &Hello{}

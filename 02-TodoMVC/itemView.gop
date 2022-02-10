@@ -1,0 +1,83 @@
+import (
+	"gop-app-tutorials/log"
+
+	"github.com/hexops/vecty"
+	"github.com/hexops/vecty/elem"
+	"github.com/hexops/vecty/event"
+	"github.com/hexops/vecty/prop"
+)
+
+type ItemView struct {
+	vecty.Core
+	Root vecty.Component
+
+	Item  *Item
+	Index int
+
+	Editing bool
+}
+
+func (p *ItemView) Render() vecty.ComponentOrHTML {
+	return elem.listItem(
+		vecty.markup(
+			vecty.ClassMap{
+				"completed": p.Item.Completed,
+				"editing":   p.Editing,
+			},
+		),
+
+		elem.div(
+			vecty.markup(
+				vecty.class("view"),
+			),
+			elem.input(
+				vecty.markup(
+					vecty.class("toggle"),
+					prop.checked(p.Item.Completed),
+					prop.Type(prop.TypeCheckbox),
+					event.change(p.onCheckboxClick),
+				),
+			),
+			elem.label(
+				vecty.markup(
+					event.doubleClick(p.onStartEdit),
+				),
+				vecty.text(p.Item.Title),
+			),
+			elem.button(
+				vecty.markup(
+					vecty.class("destroy"),
+					event.click(p.onDestroy),
+				),
+			),
+		),
+
+		elem.input(
+			vecty.Markup(
+				vecty.Class("edit"),
+				event.submit(p.onStopEdit),
+			),
+		),
+	)
+}
+
+func (p *ItemView) onCheckboxClick(e *vecty.Event) {
+	p.Item.Completed = !p.Item.Completed
+	vecty.rerender(p)
+}
+
+func (p *ItemView) onStartEdit(e *vecty.Event) {
+	log.println "item double clicked:", p.Item.Title
+}
+
+func (p *ItemView) onStopEdit(e *vecty.Event) {
+	p.Editing = false
+	vecty.rerender p
+}
+
+func (p *ItemView) onDestroy(e *vecty.Event) {
+	log.println "destroy item:", p.Index, p.Item.Title
+	Items = append(Items[:p.Index], Items[p.Index+1:]...)
+	vecty.rerender p
+	vecty.rerender p.Root
+}

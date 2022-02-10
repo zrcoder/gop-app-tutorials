@@ -1,0 +1,93 @@
+import (
+	"gop-app-tutorials/log"
+
+	"github.com/hexops/vecty"
+	"github.com/hexops/vecty/elem"
+	"github.com/hexops/vecty/event"
+	"github.com/hexops/vecty/prop"
+)
+
+type Page struct {
+	vecty.Core
+}
+
+func (p *Page) Render() vecty.ComponentOrHTML {
+	return elem.body(
+		elem.section(
+			vecty.markup(
+				vecty.class("todoapp"),
+			),
+			p.header(),
+			vecty.If(len(Items) > 0,
+				p.itemList(),
+				p.footer(),
+			),
+		),
+		p.info(),
+	)
+}
+
+func (p *Page) header() *vecty.HTML {
+	return elem.header(vecty.markup(vecty.class("header")),
+		elem.heading1(vecty.text("todos")),
+		elem.input(
+			vecty.markup(
+				vecty.class("new-todo"),
+				prop.placeholder("What needs to be done?"),
+				prop.autofocus(true),
+				event.change(p.onHeaderEditEnd),
+			),
+		),
+	)
+}
+
+func (p *Page) onHeaderEditEnd(e *vecty.Event) {
+	title := e.Target.get("value").string
+	Items = append(Items, &Item{Title: title})
+	e.Target.set("value", "")
+	vecty.rerender(p)
+}
+
+func (p *Page) itemList() *vecty.HTML {
+	var itemViews vecty.List
+	for i, item := range Items {
+		if (Filter == Active && item.Completed) || (Filter == Completed && !item.Completed) {
+			continue
+		}
+		log.println "item to show:", item.Title
+		itemViews = append(itemViews, &ItemView{Index: i, Item: item, Root: p})
+	}
+	log.println itemViews.string
+	return elem.section(
+		vecty.markup(
+			vecty.class("main"),
+		),
+		elem.unorderedList(
+			vecty.markup(
+				vecty.class("todo-list"),
+			),
+			itemViews,
+		),
+	)
+}
+
+func (p *Page) footer() *vecty.HTML {
+	return elem.div()
+}
+
+func (p *Page) info() *vecty.HTML {
+	return elem.footer(
+		vecty.markup(
+			vecty.class("info"),
+		),
+		elem.paragraph(
+			vecty.text("Double-click to edit a todo"),
+		),
+		elem.anchor(
+			vecty.markup(
+				prop.href("http://todomvc.com"),
+			),
+			vecty.text("TodoMVC"),
+		),
+	)
+}

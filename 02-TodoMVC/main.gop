@@ -1,0 +1,9 @@
+import (
+	"gop-app-tutorials/log"
+
+	"github.com/hexops/vecty"
+)
+
+vecty.setTitle "Go+ • TodoMVC"
+vecty.addStylesheet "static/style.css"
+vecty.renderBody &Page{}

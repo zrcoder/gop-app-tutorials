@@ -1,0 +1,60 @@
+import (
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
+)
+
+const indexHtml = `
+<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+  <script src="wasm_exec.js"></script>
+  <script>
+    if (!WebAssembly.instantiateStreaming) {
+      WebAssembly.instantiateStreaming = async (resp, importObject) => {
+        const source = await (await resp).arrayBuffer();
+        return await WebAssembly.instantiate(source, importObject);
+      };
+    }
+
+    const go = new Go();
+    let mod, inst;
+    WebAssembly.instantiateStreaming(fetch("app.wasm"), go.importObject).then(async (result) => {
+      mod = result.module;
+      inst = result.instance;
+      await go.run(inst)
+    });
+  </script>
+</body>
+
+</html>
+`
+
+func panicErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+dir := os.Args[1]
+port := os.Args[2]
+
+serveDir := filepath.Join(dir, "web")
+
+wasmExecFile := filepath.Join(runtime.GOROOT(), "misc", "wasm", "wasm_exec.js")
+b, err := ioutil.ReadFile(wasmExecFile)
+panicErr err
+err = ioutil.WriteFile(filepath.Join(serveDir, "wasm_exec.js"), b, 0600)
+panicErr err
+err = ioutil.WriteFile(filepath.Join(serveDir, "index.html"), []byte(indexHtml), 0600)
+panicErr err
+
+http.handle "/", http.FileServer(http.Dir(serveDir))
+printf "serving on [http://localhost:%s]\n", port
+println http.ListenAndServe(":"+port, nil)
