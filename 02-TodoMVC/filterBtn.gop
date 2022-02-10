@@ -1,0 +1,22 @@
+import (
+	"github.com/zrcoder/app"
+)
+
+type FilterButton struct {
+	app.Compo
+	Selected bool
+	Label    string
+	Filter   FilterState
+}
+
+func (p *FilterButton) Render() app.UI {
+	selected := ""
+	if p.Selected {
+		selected = "selected"
+	}
+	return app.li.body(
+		app.a.class(selected).text(p.Label).onClick(func(ctx app.Context, e app.Event) {
+			Filter = p.Filter
+		}),
+	)
+}

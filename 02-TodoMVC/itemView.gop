@@ -1,83 +1,50 @@
 import (
 	"gop-app-tutorials/log"
 
-	"github.com/hexops/vecty"
-	"github.com/hexops/vecty/elem"
-	"github.com/hexops/vecty/event"
-	"github.com/hexops/vecty/prop"
+	"github.com/zrcoder/app"
 )
 
 type ItemView struct {
-	vecty.Core
-	Root vecty.Component
+	app.Compo
 
 	Item  *Item
 	Index int
 
-	Editing bool
+	isEditing bool
 }
 
-func (p *ItemView) Render() vecty.ComponentOrHTML {
-	return elem.listItem(
-		vecty.markup(
-			vecty.ClassMap{
-				"completed": p.Item.Completed,
-				"editing":   p.Editing,
-			},
+func (p *ItemView) Render() app.UI {
+	completed, editing := "", ""
+	if p.Item.Completed {
+		completed = "completed"
+	}
+	if p.isEditing {
+		editing = "editing"
+	}
+	return app.li.class(completed).class(editing).body(
+		app.div.class("view").body(
+			app.input.Type("checkbox").class("toggle").checked(p.Item.Completed).onChange(p.onCheckBoxClick),
+			app.label.text(p.Item.Title).onDblClick(p.onStartEdit),
+			app.button.class("destroy").onClick(p.onDelete),
 		),
-
-		elem.div(
-			vecty.markup(
-				vecty.class("view"),
-			),
-			elem.input(
-				vecty.markup(
-					vecty.class("toggle"),
-					prop.checked(p.Item.Completed),
-					prop.Type(prop.TypeCheckbox),
-					event.change(p.onCheckboxClick),
-				),
-			),
-			elem.label(
-				vecty.markup(
-					event.doubleClick(p.onStartEdit),
-				),
-				vecty.text(p.Item.Title),
-			),
-			elem.button(
-				vecty.markup(
-					vecty.class("destroy"),
-					event.click(p.onDestroy),
-				),
-			),
-		),
-
-		elem.input(
-			vecty.Markup(
-				vecty.Class("edit"),
-				event.submit(p.onStopEdit),
-			),
-		),
+		app.input.class("edit").value(p.Item.Title).onChange(p.onStopEdit).onBlur(p.onStopEdit),
 	)
 }
 
-func (p *ItemView) onCheckboxClick(e *vecty.Event) {
+func (p *ItemView) onCheckBoxClick(ctx app.Context, e app.Event) {
 	p.Item.Completed = !p.Item.Completed
-	vecty.rerender(p)
 }
 
-func (p *ItemView) onStartEdit(e *vecty.Event) {
-	log.println "item double clicked:", p.Item.Title
+func (p *ItemView) onStartEdit(ctx app.Context, e app.Event) {
+	p.isEditing = true
 }
 
-func (p *ItemView) onStopEdit(e *vecty.Event) {
-	p.Editing = false
-	vecty.rerender p
+func (p *ItemView) onStopEdit(ctx app.Context, e app.Event) {
+	p.isEditing = false
+	p.Item.Title = ctx.jsSrc.get("value").string
 }
 
-func (p *ItemView) onDestroy(e *vecty.Event) {
-	log.println "destroy item:", p.Index, p.Item.Title
+func (p *ItemView) onDelete(ctx app.Context, e app.Event) {
+	log.println "delete item:", p.Index, p.Item.Title
 	Items = append(Items[:p.Index], Items[p.Index+1:]...)
-	vecty.rerender p
-	vecty.rerender p.Root
 }

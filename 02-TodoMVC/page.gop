@@ -1,24 +1,18 @@
 import (
-	"gop-app-tutorials/log"
+	"strconv"
 
-	"github.com/hexops/vecty"
-	"github.com/hexops/vecty/elem"
-	"github.com/hexops/vecty/event"
-	"github.com/hexops/vecty/prop"
+	"github.com/zrcoder/app"
 )
 
 type Page struct {
-	vecty.Core
+	app.Compo
 }
 
-func (p *Page) Render() vecty.ComponentOrHTML {
-	return elem.body(
-		elem.section(
-			vecty.markup(
-				vecty.class("todoapp"),
-			),
+func (p *Page) Render() app.UI {
+	return app.div.body(
+		app.section.class("todoapp").body(
 			p.header(),
-			vecty.If(len(Items) > 0,
+			app.If(len(Items) > 0,
 				p.itemList(),
 				p.footer(),
 			),
@@ -27,67 +21,75 @@ func (p *Page) Render() vecty.ComponentOrHTML {
 	)
 }
 
-func (p *Page) header() *vecty.HTML {
-	return elem.header(vecty.markup(vecty.class("header")),
-		elem.heading1(vecty.text("todos")),
-		elem.input(
-			vecty.markup(
-				vecty.class("new-todo"),
-				prop.placeholder("What needs to be done?"),
-				prop.autofocus(true),
-				event.change(p.onHeaderEditEnd),
-			),
-		),
+func (p *Page) header() app.UI {
+	return app.header.class("header").body(
+		app.h1.text("todos"),
+		app.input.class("new-todo").
+			autoFocus(true).
+			placeholder("What needs to be done?").
+			onChange(p.onHeaderInputChange),
 	)
 }
 
-func (p *Page) onHeaderEditEnd(e *vecty.Event) {
-	title := e.Target.get("value").string
+func (p *Page) onHeaderInputChange(ctx app.Context, e app.Event) {
+	title := ctx.jsSrc.get("value").string
 	Items = append(Items, &Item{Title: title})
-	e.Target.set("value", "")
-	vecty.rerender(p)
+	ctx.jsSrc.set("value", "")
 }
 
-func (p *Page) itemList() *vecty.HTML {
-	var itemViews vecty.List
+func (p *Page) itemList() app.UI {
+	var itemViews []*ItemView
 	for i, item := range Items {
 		if (Filter == Active && item.Completed) || (Filter == Completed && !item.Completed) {
 			continue
 		}
-		log.println "item to show:", item.Title
-		itemViews = append(itemViews, &ItemView{Index: i, Item: item, Root: p})
+		itemViews = append(itemViews, &ItemView{Index: i, Item: item})
 	}
-	log.println itemViews.string
-	return elem.section(
-		vecty.markup(
-			vecty.class("main"),
-		),
-		elem.unorderedList(
-			vecty.markup(
-				vecty.class("todo-list"),
-			),
-			itemViews,
+	return app.section.class("main").body(
+		app.ul.class("todo-list").body(
+			app.Range(itemViews).slice(func(i int) app.UI {
+				return itemViews[i]
+			}),
 		),
 	)
 }
 
-func (p *Page) footer() *vecty.HTML {
-	return elem.div()
+func (p *Page) footer() app.UI {
+	lefts := 0
+	for item <- Items, !item.Completed {
+		lefts++
+	}
+	itemsLeftText := " items left"
+	if lefts == 1 {
+		itemsLeftText = " item left"
+	}
+	completed := len(Items) - lefts
+
+	return app.footer.class("footer").body(
+		app.span.class("todo-count").body(
+			app.strong().text(strconv.Itoa(lefts)),
+			app.text(itemsLeftText),
+		),
+		app.ul.class("filters").body(
+			&FilterButton{Label: "All", Filter: All, Selected: Filter == All},
+			app.text("	"),
+			&FilterButton{Label: "Active", Filter: Active, Selected: Filter == Active},
+			app.text("	"),
+			&FilterButton{Label: "Completed", Filter: Completed, Selected: Filter == Completed},
+		),
+		app.If(completed > 0,
+			app.button.class("clear-completed").text("Clear completed ("+strconv.Itoa(completed)+")").onClick(p.onClearCompleted),
+		),
+	)
 }
 
-func (p *Page) info() *vecty.HTML {
-	return elem.footer(
-		vecty.markup(
-			vecty.class("info"),
-		),
-		elem.paragraph(
-			vecty.text("Double-click to edit a todo"),
-		),
-		elem.anchor(
-			vecty.markup(
-				prop.href("http://todomvc.com"),
-			),
-			vecty.text("TodoMVC"),
-		),
+func (p *Page) onClearCompleted(ctx app.Context, e app.Event) {
+	Items = [item for item <- Items, !item.Completed]
+}
+
+func (p *Page) info() app.UI {
+	return app.footer.class("info").body(
+		app.p.text("Double-click to edit a todo"),
+		app.a.href("http://todomvc.com").text("TodoMVC"),
 	)
 }

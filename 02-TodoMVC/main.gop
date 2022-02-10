@@ -1,9 +1,21 @@
 import (
+	"net/http"
+
 	"gop-app-tutorials/log"
 
-	"github.com/hexops/vecty"
+	"github.com/zrcoder/app"
 )
 
-vecty.setTitle "Go+ • TodoMVC"
-vecty.addStylesheet "static/style.css"
-vecty.renderBody &Page{}
+app.route "/", &Page{}
+app.runWhenOnBrowser
+
+http.handle "/", &app.Handler{
+	Name:         "Todos",
+	Title:        "Go+ :: TodoMVC",
+	Icon:         app.Icon{Default: "/web/static/logo.png"},
+	LoadingLabel: "Todos",
+	Author:       "zrcoder",
+	Styles:       ["/web/static/style.css"],
+}
+log.println "serving on [http://localhost:9991]"
+log.println http.listenAndServe(":9991", nil)
