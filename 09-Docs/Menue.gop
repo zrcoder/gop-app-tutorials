@@ -1,0 +1,69 @@
+import (
+	"github.com/zrcoder/app"
+	"github.com/zrcoder/app/ui"
+)
+
+type Menu struct {
+	app.Compo
+}
+
+func newMenu() *Menu {
+	return &Menu{}
+}
+
+func (m *Menu) Render() app.UI {
+	return ui.scroll.class("menu fill").headerHeight(headerHeight).
+		header(
+			app.div.onClick(m.itemClickHandler(homeSVG, "Home", "home")).body(
+				ui.Icon().src(gopSVG).size(60),
+			),
+		).content(
+		app.nav.body(
+			m.newLink(homeSVG, "Home", "home"),
+			m.newLink(rocketSVG, "Getting Started", "getting-started"),
+			m.newLink(fileTreeSVG, "Architecture", "architecture"),
+
+			app.Div().class("separator"),
+			m.newLink(gridSVG, "Components", "components"),
+			m.newLink(keyboardSVG, "Declarative Syntax", "declarative-syntax"),
+			m.newLink(routeSVG, "Routing", "routing"),
+			m.newLink(imgFolderSVG, "Static Resources", "static-resources"),
+			m.newLink(jsSVG, "JavaScript Interoperability", "js"),
+			m.newLink(concurrencySVG, "Concurrency", "concurrency"),
+			m.newLink(seoSVG, "SEO", "seo"),
+			m.newLink(arrowSVG, "Lifecycle and Updates", "lifecycle"),
+			m.newLink(downloadSVG, "Install", "install"),
+			m.newLink(testSVG, "Testing", "testing"),
+			m.newLink(actionSVG, "Actions", "actions"),
+			m.newLink(stateSVG, "State Management", "states"),
+
+			app.Div().class("separator"),
+			m.newLink(githubSVG, "Deploy on GitHub Pages", "github-deploy"),
+
+			app.Div().class("separator"),
+		),
+	)
+}
+
+const linkClass = "link heading fit unselectable"
+
+func (m *Menu) newLink(svg, title, doc string) app.UI {
+	focusClass := ""
+	if CurDoc.Name == doc {
+		focusClass = "focus"
+	}
+	return ui.link.class(linkClass).class(focusClass).icon(svg).label(title).
+		onClick(m.itemClickHandler(svg, title, doc))
+}
+
+func (m *Menu) newRemoteLink(svg, title, url string) app.UI {
+	return ui.link.class(linkClass).icon(svg).label(title).href(url)
+}
+
+func (m *Menu) itemClickHandler(svg, title, doc string) app.EventHandler {
+	return func(ctx app.Context, e app.Event) {
+		CurDoc.Icon = svg
+		CurDoc.Title = title
+		CurDoc.Name = doc
+	}
+}

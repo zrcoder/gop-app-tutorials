@@ -1,0 +1,47 @@
+import (
+	"fmt"
+
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/parser"
+	"github.com/zrcoder/app"
+)
+
+type DocContent struct {
+	app.Compo
+
+	Icontent string
+}
+
+func newDocContent() *DocContent {
+	return &DocContent{}
+}
+
+func (d *DocContent) Data(v []byte) *DocContent {
+	d.Icontent = fmt.Sprintf(`<div class="markdown">%s</div>`, parseMarkdown(v))
+	return d
+}
+
+func parseMarkdown(md []byte) []byte {
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	parser := parser.NewWithExtensions(extensions)
+	return markdown.ToHTML(md, parser, nil)
+}
+
+func (d *DocContent) OnMount(ctx app.Context) {
+	ctx.Defer(d.highlightCode)
+}
+
+func (d *DocContent) OnUpdate(ctx app.Context) {
+	ctx.Defer(d.highlightCode)
+	ctx.Defer(scrollTo)
+}
+
+func (d *DocContent) highlightCode(ctx app.Context) {
+	app.Window().Get("hljs").Call("highlightAll")
+}
+
+func (d *DocContent) Render() app.UI {
+	return app.div.class("fill").body(
+		app.Raw(d.Icontent),
+	)
+}

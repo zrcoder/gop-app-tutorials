@@ -11,9 +11,7 @@ const (
 	Completed
 )
 
-
 var (
 	Items  []*Item
 	Filter FilterState = All
 )
-

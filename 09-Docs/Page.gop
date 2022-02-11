@@ -1,0 +1,53 @@
+import (
+	"gop-app-tutorials/log"
+
+	"github.com/zrcoder/app"
+	"github.com/zrcoder/app/ui"
+)
+
+const (
+	githubURL = "https://github.com/zrcoder/gop-app-tutorials"
+)
+
+type Page struct {
+	app.Compo
+}
+
+func (p *Page) Render() app.UI {
+	return ui.shell.class("fill").
+		hamburgerMenu(
+			app.div.class("fill menu-background").body(
+				newMenu(),
+			),
+		).
+		menu(
+			newMenu(),
+		).
+		index(
+			ui.scroll.class("fill").headerHeight(headerHeight).content(
+				newDocLoader().doc(CurDoc.Name).renderType(DocRenderTypeIndex),
+			),
+		).
+		content(
+			ui.scroll.class("fill").headerHeight(headerHeight).
+				header(
+					ui.stack.class("fill").right.middle.content(
+						ui.link.class("link heading fit").icon(githubSVG).label("Github").href(githubURL),
+					),
+				).
+				content(
+					app.article.body(
+						app.header.ID("page-top").class("page-title").class("center").body(
+							ui.stack.center.middle.content(
+								ui.icon.class("icon-left").size(90).src(CurDoc.Icon),
+								app.h1.text(CurDoc.Title),
+							),
+						),
+						app.div.class("separator"),
+						newDocLoader().doc(CurDoc.Name).renderType(DocRenderTypeContent),
+						app.div.class("separator"),
+						app.div.class("separator"),
+					),
+				),
+		)
+}

@@ -1,0 +1,78 @@
+import (
+	"gop-app-tutorials/log"
+
+	"github.com/zrcoder/app"
+	"github.com/zrcoder/app/ui"
+)
+
+type DocRenderType = int
+
+const (
+	DocRenderTypeIndex = iota
+	DocRenderTypeContent
+)
+
+type DocLoader struct {
+	app.Compo
+
+	Isrc        string
+	iRenderType DocRenderType
+	md          MarkdownContent
+}
+
+func newDocLoader() *DocLoader {
+	return &DocLoader{}
+}
+
+func (d *DocLoader) Doc(doc string) *DocLoader {
+	d.Isrc = "/web/static/md/" + doc + ".md"
+	return d
+}
+
+func (d *DocLoader) RenderType(t DocRenderType) *DocLoader {
+	d.iRenderType = t
+	return d
+}
+
+func (d *DocLoader) OnMount(ctx app.Context) {
+	d.load(ctx)
+}
+
+func (d *DocLoader) OnUpdate(ctx app.Context) {
+	d.load(ctx)
+}
+
+func (d *DocLoader) load(ctx app.Context) {
+	src := d.Isrc
+	ctx.ObserveState(src).
+		While(func() bool {
+			return src == d.Isrc
+		}).
+		onChange(func() {
+			ctx.Defer(scrollTo)
+		}).
+		value(&d.md)
+
+	ctx.newAction(GetMarkdownActionKey, app.T("path", d.Isrc))
+}
+
+func scrollTo(ctx app.Context) {
+	id := ctx.Page().URL().Fragment
+	if id == "" {
+		id = "page-top"
+	}
+	ctx.ScrollTo(id)
+}
+
+func (d *DocLoader) Render() app.UI {
+	return app.div.body(
+		ui.loader.class("heading fill").loading(d.md.Status == Loading).err(d.md.Err).label("loading..."),
+		app.If(d.md.Status == Loaded,
+			app.If(d.iRenderType == DocRenderTypeIndex,
+				newDocIndex().data(d.md.Data),
+			).Else(
+				newDocContent().data(d.md.Data),
+			),
+		),
+	)
+}

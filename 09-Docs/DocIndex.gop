@@ -1,0 +1,70 @@
+import (
+	"strings"
+
+	"github.com/zrcoder/app"
+	"github.com/zrcoder/app/ui"
+)
+
+type DocIndex struct {
+	app.Compo
+
+	Ititles []string
+}
+
+func newDocIndex() *DocIndex {
+	return &DocIndex{}
+}
+
+func (p *DocIndex) Data(data []byte) *DocIndex {
+	src := string(data)
+	lines := strings.Split(src, "\n")
+	for _, line := range lines {
+		line = strings.trimSpace(line)
+		i := strings.index(line, " ")
+		if i < 0 || !isHeadingPrefix(line[:i]) {
+			continue
+		}
+		title := strings.trimSpace(line[i+1:])
+		p.Ititles = append(p.Ititles, indent(title, i))
+	}
+	return p
+}
+
+func isHeadingPrefix(s string) bool {
+	return len(s) == strings.count(s, "#")
+}
+
+func indent(s string, n int) string {
+	n -= 2
+	buf := strings.Builder{}
+	for n > 0 {
+		buf.writeString("  ")
+		n--
+	}
+	buf.writeString(s)
+	return buf.string
+}
+
+func (p *DocIndex) Render() app.UI {
+	return app.div.class("fill").body(
+		app.Range(p.Ititles).slice(func(i int) app.UI {
+			title := p.Ititles[i]
+			fragment := titleToFragment(title)
+			href := "#" + fragment
+			focus := ""
+			if app.Window().URL().Fragment == fragment {
+				focus = "focus"
+			}
+			return ui.link.class(focus).class("link heading index-link").label(title).href(href)
+		}),
+	)
+}
+
+func titleToFragment(v string) string {
+	v = strings.TrimSpace(v)
+	v = strings.ToLower(v)
+	v = strings.ReplaceAll(v, " ", "-")
+	v = strings.ReplaceAll(v, ".", "-")
+	v = strings.ReplaceAll(v, "?", "")
+	return v
+}

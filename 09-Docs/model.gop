@@ -1,0 +1,27 @@
+type Document struct {
+	Icon  string
+	Title string
+	Name  string
+}
+
+var CurDoc = Document{
+	Icon:  homeSVG,
+	Title: "Home",
+	Name:  "home",
+}
+
+type MarkdownContent struct {
+	Status status
+	Err    error
+	Toc    []string
+	Data   []byte
+}
+
+type status = int
+
+const (
+	NeverLoaded status = iota
+	Loading
+	LoadingErr
+	Loaded
+)

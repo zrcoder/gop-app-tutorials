@@ -1,0 +1,46 @@
+import (
+	"io/ioutil"
+	"net/http"
+
+	"gop-app-tutorials/log"
+
+	"github.com/zrcoder/app"
+	"github.com/zrcoder/app/errors"
+)
+
+func HandleGetMarkdown(ctx app.Context, a app.Action) {
+	log.println "begion to get md"
+	path := a.Tags.Get("path")
+	if path == "" {
+		log.println errors.New("getting markdown failed").
+			Tag("reason", "empty path")
+		return
+	}
+
+	log.println "md path:", path
+	state := path
+	var md MarkdownContent
+	ctx.GetState(state, &md)
+	switch md.Status {
+	case Loading, Loaded:
+		return
+	}
+
+	md.Status = Loading
+	md.Err = nil
+	ctx.SetState(state, md)
+
+	res, err := http.Get(path)
+	if err != nil {
+		md.Status = LoadingErr
+		md.Err = errors.New("getting markdown failed").Wrap(err)
+		ctx.SetState(state, md)
+		return
+	}
+	defer res.Body.Close()
+	data, _ := ioutil.ReadAll(res.Body)
+
+	md.Status = Loaded
+	md.Data = data
+	ctx.SetState(state, md)
+}

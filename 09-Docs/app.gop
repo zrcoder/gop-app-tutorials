@@ -1,0 +1,29 @@
+import (
+	"net/http"
+
+	"gop-app-tutorials/log"
+
+	"github.com/zrcoder/app"
+)
+
+// each document will make an anction to get markdown, so register a global handler here
+app.handle GetMarkdownActionKey, HandleGetMarkdown
+app.route "/", &Page{}
+app.runWhenOnBrowser
+
+handler := &app.Handler{
+	Name:         "GO+ APP Docs",
+	Title:        "GO+ APP :: Docs",
+	Icon:         app.Icon{Default: "/web/static/images/calf.png"},
+	LoadingLabel: "GO+ APP Docs",
+	Author:       "zrcoder",
+	Styles: [
+		"/web/static/css/style.css",
+		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/styles/vs.min.css",
+	],
+	Scripts: ["https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"],
+}
+
+http.handle "/", handler
+log.println "serving on [http://localhost:9999]"
+log.println http.listenAndServe(":9999", nil)
