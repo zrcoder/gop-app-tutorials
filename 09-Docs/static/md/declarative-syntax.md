@@ -9,12 +9,8 @@ Here is an example where HTML elements are used to display a title and a paragra
 ```go
 func (c *myCompo) Render() app.UI {
 	return app.Div().Body(
-		app.H1().
-			Class("title").
-			Text("Build a GUI with Go"),
-		app.P().
-			Class("text").
-			Text("Just because Go and this package are really awesome!"),
+		app.h1.class("title").text("Build a GUI with Go"),
+		app.p.class("text").text("Just because Go and this package are really awesome!"),
 	)
 }
 ```
@@ -23,7 +19,7 @@ func (c *myCompo) Render() app.UI {
 
 Go-app provides interfaces for each standard HTML element. Those interfaces describe setters for attributes and event handlers.
 
-Here is a simplified version of the interface for a [\<div>](/reference#HTMLDiv):
+Here is a simplified version of the interface for a `<div>`:
 
 ```go
 type HTMLDiv interface {
@@ -42,11 +38,11 @@ type HTMLDiv interface {
 
 ### Create
 
-An HTML element is created by calling a function named after its name. The example below shows how to create a [\<div>](/reference#Div):
+An HTML element is created by calling a function named after its name. The example below shows how to create a `\<div>`:
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div()
+	return app.div
 }
 ```
 
@@ -57,8 +53,8 @@ A standard HTML element is an element that can contain other UI elements. Other 
 ```go
 func (c *myCompo) Render() app.UI {
 	return app.Div().Body(       // Div Container
-		app.H1().Text("Title"),  // First child
-		app.P().Text("Content"), // Second child
+		app.h1.text("Title"),  // First child
+		app.p.text("Content"), // Second child
 	)
 }
 ```
@@ -69,7 +65,7 @@ A self-closing element is an HTML element that cannot contain other UI elements.
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Img().Src("/myImage.png")
+	return app.img.src("/myImage.png")
 }
 ```
 
@@ -79,7 +75,7 @@ HTML element interfaces provide methods to set element attributes. Here is an ex
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().Class("my-class")
+	return app.div.class("my-class")
 }
 ```
 
@@ -87,10 +83,7 @@ Multiple attributes are set by using the chaining mechanism:
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().
-		ID("id-name").
-		Class("class-1").
-		Class("class-2")
+	return app.div.ID("id-name").class("class-1").class("class-2")
 }
 ```
 
@@ -100,7 +93,7 @@ Style is an attribute that sets the element style with CSS.
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().Style("width", "400px")
+	return app.div.style("width", "400px")
 }
 ```
 
@@ -108,16 +101,16 @@ Like the `Class()` attribute, multiple styles are set by using the chaining mech
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().
-		Style("width", "400px").
-		Style("height", "200px").
-		Style("background-color", "deepskyblue")
+	return app.div.
+  	style("width", "400px").
+  	style("height", "200px").
+  	style("background-color", "deepskyblue")
 }
 ```
 
 ### Event handlers
 
-[Event handlers](/reference#EventHandler) are functions that are called when an HTML event occurs. They must have the following signature:
+`Event handlers` are functions that are called when an HTML event occurs. They must have the following signature:
 
 ```go
 func(ctx app.Context, e app.Event)
@@ -127,37 +120,37 @@ Like attributes, HTML element interfaces provide methods to associate an event t
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().OnClick(c.onClick)
+	return app.div.onClick(c.onClick)
 }
 
 func (c *myCompo) onClick(ctx app.Context, e app.Event) {
-	fmt.Println("onClick is called")
+	println "onClick is called"
 }
 ```
 
-The [Context](/reference#Context) argument embeds several go-app tools that help in creating responsive UIs. Usable with any function accepting a [Go standard context](https://golang.org/pkg/context/#Context), it is canceled when the source of the event is dismounted. The source element value can be retrieved with the JSSrc field:
+The `Context` argument embeds several go-app tools that help in creating responsive UIs. Usable with any function accepting a [Go standard context](https://golang.org/pkg/context/#Context), it is canceled when the source of the event is dismounted. The source element value can be retrieved with the JSSrc field:
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().OnChange(c.onChange)
+	return app.div.onChange(c.onChange)
 }
 
 func (c *myCompo) onChange(ctx app.Context, e app.Event) {
-	v := ctx.JSSrc().Get("value")
+	v := ctx.jsSrc.get("value")
 }
 ```
 
-`ctx.JSSrc` and [Event](/reference#Event) are [JavaScript objects wrapped in Go interfaces](/js).
+`ctx.jSSrc` and `Event` are `JavaScript objects wrapped in Go interfaces`.
 
 ## Text
 
-[Text()](/reference#Text) represents simple HTML text. Here is an example that display a `Hello World` text:
+`Text()` represents simple HTML text. Here is an example that display a `Hello World` text:
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().Body( // Container
-		app.Text("Hello"), // First text
-		app.Text("World"), // Second text
+	return app.div.body( // Container
+		app.text("Hello"), // First text
+		app.text("World"), // Second text
 	)
 }
 ```
@@ -166,19 +159,19 @@ When an HTML element embeds a single text element, HTML element's `Text()` metho
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Div().Text("Hello World")
+	return app.div.text("Hello World")
 }
 ```
 
 ## Raw elements
 
-[Raw elements](/reference#Raw) are elements representing plain HTML code. Be aware that using them is **unsafe since there is no check on HTML format**.
+`Raw elements` are elements representing plain HTML code. Be aware that using them is **unsafe since there is no check on HTML format**.
 
 Here is an example that creates a `<svg>` element.
 
 ```go
 func (c *myCompo) Render() app.UI {
-	return app.Raw(`
+	return app.raw(`
 	<svg width="100" height="100">
 		<circle cx="50" cy="50" r="40" stroke="green" stroke-width="4" fill="yellow" />
 	</svg>
@@ -200,7 +193,7 @@ type foo struct {
 
 func (f *foo) Render() app.UI {
 	return app.P().Body(
-		app.Text("Foo, "), // Simple HTML text
+		app.text("Foo, "), // Simple HTML text
 		&bar{},            // Nested bar component
 	)
 }
@@ -211,13 +204,13 @@ type bar struct {
 }
 
 func (b *bar) Render() app.UI {
-	return app.Text("Bar!")
+	return app.text("Bar!")
 }
 ```
 
 ## Condition
 
-A [Condition](/reference#Condition) is a construct that selects the UI elements that satisfy a condition. They are created by calling the [If()](/reference#If) function.
+A ·Condition· is a construct that selects the UI elements that satisfy a condition. They are created by calling the `If()` function.
 
 ### If
 
@@ -231,9 +224,9 @@ type myCompo struct {
 }
 
 func (c *myCompo) Render() app.UI {
-	return app.Div().Body(
+	return app.div.body(
 		app.If(c.showTitle,
-			app.H1().Text("hello"),
+			app.h1.text("hello"),
 		),
 	)
 }
@@ -253,17 +246,17 @@ type myCompo struct {
 func (c *myCompo) Render() app.UI {
 	return app.Div().Body(
 		app.If(c.color > 7,
-			app.H1().
-				Style("color", "green").
-				Text("Good!"),
+			app.h1.
+				style("color", "green").
+				text("Good!"),
 		).ElseIf(c.color < 4,
-			app.H1().
-				Style("color", "red").
-				Text("Bad!"),
+			app.h1.
+				style("color", "red").
+				text("Bad!"),
 		).Else(
-			app.H1().
-				Style("color", "orange").
-				Text("So so!"),
+			app.h1.
+				style("color", "orange").
+				text("So so!"),
 		),
 	)
 }
@@ -283,9 +276,9 @@ type myCompo struct {
 func (c *myCompo) Render() app.UI {
 	return app.Div().Body(
 		app.If(c.showTitle,
-			app.H1().Text("hello"),
+			app.h1.text("hello"),
 		).Else(
-			app.Text("world"), // Shown when showTitle == false
+			app.text("world"), // Shown when showTitle == false
 		),
 	)
 }
@@ -293,7 +286,7 @@ func (c *myCompo) Render() app.UI {
 
 ## Range
 
-Range represents a [range loop](/reference#RangeLoop) that shows UI elements generated from a [slice](#slice) or [map](#map). They are created by calling the [Range()](/reference#Range) function.
+Range represents a `range loop` that shows UI elements generated from a `slice` or [map](#map). They are created by calling the `Range()` function.
 
 ### Slice
 
@@ -309,8 +302,8 @@ func (c *myCompo) Render() app.UI {
 	}
 
 	return app.Ul().Body(
-		app.Range(data).Slice(func(i int) app.UI {
-			return app.Li().Text(data[i])
+		app.Range(data).slice(func(i int) app.UI {
+			return app.li.text(data[i])
 		}),
 	)
 }
@@ -333,7 +326,7 @@ func (c *myCompo) Render() app.UI {
 		app.Range(data).Map(func(k string) app.UI {
 			s := fmt.Sprintf("%s: %v/10", k, data[k])
 
-			return app.Li().Text(s)
+			return app.li.text(s)
 		}),
 	)
 }
@@ -345,7 +338,7 @@ Form helpers are [component](/components) methods that help to map HTML form ele
 
 ### ValueTo
 
-[ValueTo](/reference#Compo.ValueTo) maps, when it exists, an HTML element value property to a given variable.
+`ValueTo` returns an `event handler` which maps an HTML element value property to a given variable.
 
 Here is a Hello component version that uses the `ValueTo()` method to get the username from its input rather than defining an [event handler](/declarative-syntax#event-handlers):
 
@@ -358,16 +351,16 @@ type hello struct {
 
 func (h *hello) Render() app.UI {
 	return app.Div().Body(
-		app.H1().Text("Hello " + h.name),
-		app.P().Body(
-			app.Input().
-				Type("text").
-				Value(h.name).
-				Placeholder("What is your name?").
-				AutoFocus(true).
+		app.h1.text("Hello " + h.name),
+		app.p.body(
+			app.input.
+				type("text").
+				value(h.name).
+				placeholder("What is your name?").
+				autoFocus(true).
 				// Here the username is directly mapped from the input's change
 				// event.
-				OnChange(h.ValueTo(&h.name)),
+				onChange(h.valueTo(&h.name)),
 		),
 	)
 }

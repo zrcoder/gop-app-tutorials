@@ -2,7 +2,7 @@
 
 Since WebAssembly is browser-based technology, some scenarios may require DOM access and JavaScript calls.
 
-This is usually done with the help of [syscall/js](https://golang.org/pkg/syscall/js/) but for compatibility and tooling reasons, **go-app wraps the JS standard package**. Interacting with JavaScript is done by using the [Value](/reference#Value) interface.
+This is usually done with the help of [syscall/js](https://golang.org/pkg/syscall/js/) but for compatibility and tooling reasons, **go-app wraps the JS standard package**. Interacting with JavaScript is done by using the `Value` interface.
 
 This article provides examples that show common interactions with JavaScript.
 
@@ -12,7 +12,7 @@ Building UIs can sometimes require the need of third-party JavaScript libraries.
 
 ### Page's scope
 
-JS files can be included on a page by using the [Handler](/reference#Handler) `Scripts` field:
+JS files can be included on a page by using the `Handler` `Scripts` field:
 
 ```go
 handler := &app.Handler{
@@ -46,7 +46,7 @@ handler := &app.Handler{
 
 ### Inlined in Components
 
-JS files can also be included directly inlined into [components](/components) in the `Render()` method by using the [\<script\>](/reference#Script) HTML element.
+JS files can also be included directly inlined into [components](/components) in the `Render()` method by using the `\<script\>` HTML element.
 
 The following example asynchronously loads a YouTube video into an `<iframe>`, using a YouTube JavaScript file:
 
@@ -56,28 +56,28 @@ type youtubePlayer struct {
 }
 
 func (p *youtubePlayer) Render() app.UI {
-	return app.Div().Body(
-		app.Script().
-			Src("//www.youtube.com/iframe_api").
-			Async(true),
-		app.IFrame().
+	return app.div.body(
+		app.script.
+			src("//www.youtube.com/iframe_api").
+			async(true),
+		app.iFrame.
 			ID("yt-container").
-			Allow("autoplay").
-			Allow("accelerometer").
-			Allow("encrypted-media").
-			Allow("picture-in-picture").
-			Sandbox("allow-presentation allow-same-origin allow-scripts allow-popups").
-			Src("https://www.youtube.com/embed/LqeRF_0DDCg"),
+			allow("autoplay").
+			allow("accelerometer").
+			allow("encrypted-media").
+			allow("picture-in-picture").
+			sandbox("allow-presentation allow-same-origin allow-scripts allow-popups").
+			src("https://www.youtube.com/embed/LqeRF_0DDCg"),
 	)
 }
 ```
 
 ## Using window global object
 
-The `window` JS global object is usable from the [Window](/reference#Window) function.
+The `window` JS global object is usable from the `Window` function.
 
 ```go
-app.Window()
+app.window
 ```
 
 ### Get element by ID
@@ -91,15 +91,15 @@ let elem = document.getElementById("YOUR_ID");
 
 ```go
 // Go equivalent:
-elem := app.Window().GetElementByID("YOUR_ID")
+elem := app.window.getElementByID("YOUR_ID")
 ```
 
 It is a helper function equivalent to:
 
 ```go
-elem := app.Window().
-    Get("document").
-    Call("getElementById","YOUR_ID")
+elem := app.window.
+    get("document").
+    call("getElementById","YOUR_ID")
 ```
 
 ### Create JS object
@@ -119,9 +119,9 @@ let player = new YT.Player("yt-container", {
 
 ```go
 // Go equivalent:
-player := app.Window().
-	Get("YT").
-	Get("Player").
+player := app.window.
+	get("YT").
+	get("Player").
 	New("yt-container", map[string]interface{}{
 		"height":  390,
 		"width":   640,
@@ -131,7 +131,7 @@ player := app.Window().
 
 ## Cancel an event
 
-When implementing an [event handler](/reference#EventHandler), the event can be canceled by calling [PreventDefault()](/reference#Event.PreventDefault).
+When implementing an `event handler`, the event can be canceled by calling `PreventDefault()`.
 
 ```go
 type foo struct {
@@ -139,19 +139,19 @@ type foo struct {
 }
 
 func (f *foo) Render() app.UI {
-	return app.Div().
-		OnChange(f.onContextMenu).
-		Text("Don't copy me!")
+	return app.div.
+		onChange(f.onContextMenu).
+		text("Don't copy me!")
 }
 
 func (f *foo) onContextMenu(ctx app.Context, e app.Event) {
-	e.PreventDefault()
+	e.preventDefault
 }
 ```
 
 ## Get input value
 
-Input are usually used to get a user inputed value. Here is how to get that value when implementing an [event handler](/reference#EventHandler):
+Input are usually used to get a user inputed value. Here is how to get that value when implementing an `event handler`:
 
 ```go
 type foo struct {
@@ -159,10 +159,10 @@ type foo struct {
 }
 
 func (f *foo) Render() app.UI {
-    return app.Input().OnChange(f.onInputChange)
+    return app.input.onChange(f.onInputChange)
 }
 
 func (f *foo) onInputChange(ctx app.Context, e app.Event) {
-    v := ctx.JSSrc().Get("value").String()
+    v := ctx.jsSrc.get("value").string
 }
 ```

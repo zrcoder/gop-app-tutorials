@@ -10,7 +10,7 @@ An action is created from a `Context` by calling `NewAction(name string, tags ..
 
 ```go
 func (h *hello) onInputChange(ctx app.Context, e app.Event) {
-	ctx.NewAction("greet")
+	ctx.newAction "greet"
 }
 ```
 
@@ -18,9 +18,9 @@ A payload can also be attached with `NewActionWithValue(name string, v interface
 
 ```go
 func (h *hello) onInputChange(ctx app.Context, e app.Event) {
-	name := ctx.JSSrc().Get("value").String()
+	name := ctx.jsSrc.get("value").string
 
-	ctx.NewActionWithValue("greet", name)
+	ctx.newActionWithValue "greet", name
 }
 ```
 
@@ -28,9 +28,9 @@ A bit like an HTTP header, additional info can be attached to actions by setting
 
 ```go
 func (h *hello) onInputChange(ctx app.Context, e app.Event) {
-	name := ctx.JSSrc().Get("value").String()
+	name := ctx.jsSrc.get("value").string
 
-	ctx.NewActionWithValue("greet", name,
+	ctx.newActionWithValue("greet", name,
 		app.T("source", "input"),
 		app.T("event", "change"),
 	)
@@ -39,7 +39,7 @@ func (h *hello) onInputChange(ctx app.Context, e app.Event) {
 
 ## Handling
 
-Once an [action](/reference#Action) is created, it is propagated across the app. It can then be handled at global and/or component levels with an [ActionHandler](/reference#ActionHandler):
+Once an `action` is created, it is propagated across the app. It can then be handled at global and/or component levels with an `ActionHandler`:
 
 ```go
 type ActionHandler func(Context, Action)
@@ -47,28 +47,23 @@ type ActionHandler func(Context, Action)
 
 ### Global Level
 
-Dealing with actions at a global level is done by registering an [ActionHandler](/reference#ActionHandler) with the [Handle](/reference#Handle) function:
+Dealing with actions at a global level is done by registering an `ActionHandler`  with the `Handle` function:
 
 ```go
-func main() {
-	app.Handle("greet", handleGreet) // Registering action handler.
+app.handle "greet", handleGreet // Registering action handler.
 
-	app.Route("/", &hello{})
-	app.RunWhenOnBrowser()
+app.route "/", &hello{}
+app.runWhenOnBrowser
+// ...
 
-	// ...
-}
-
-// Action handler that is called on a separate goroutine when a "greet" action
-// is created.
+// Action handler that is called on a separate goroutine when a "greet" action is created.
 func handleGreet(ctx app.Context, a app.Action) {
 	name, ok := a.Value.(string) // Checks if a name was given.
 	if !ok {
-		fmt.Println("Hello, World")
+		println "Hello, World"
 		return
 	}
-
-	fmt.Println("Hello,", name)
+	println "Hello,", name
 }
 ```
 
@@ -76,7 +71,7 @@ func handleGreet(ctx app.Context, a app.Action) {
 
 ### Component Level
 
-Actions can also be handled at component level by registering an [ActionHandler](/reference#ActionHandler) from a [Context](/reference#Context):
+Actions can also be handled at component level by registering an `ActionHandler` from a `Context`:
 
 ```go
 func (h *hello) OnMount(ctx app.Context) {
@@ -100,7 +95,3 @@ func (h *hello) handleGreet(ctx app.Context, a app.Action) {
 ```
 
 **Executed on the UI goroutine**, handling actions from components can help **to send data from a component to another**.
-
-## Next
-
-- [State Management](/states)

@@ -34,7 +34,7 @@ On supported web browsers (usually Chromium-based), it is possible to know wheth
 
 ### Detect Install Support
 
-Detecting whether the app is installable from a web browser is done the `IsAppInstallable` [Context](/reference#Context) method:
+Detecting whether the app is installable from a web browser is done the `IsAppInstallable` Context method:
 
 ```go
 type hello struct {
@@ -45,37 +45,37 @@ type hello struct {
 }
 
 func (h *hello) OnMount(ctx app.Context) {
-	h.isAppInstallable = ctx.IsAppInstallable()
+	h.isAppInstallable = ctx.isAppInstallable
 }
 ```
 
-Since the installable state can change depending on whether the app is installed, the component that displays an install button should be notified of the change. This is done by implementing the [AppInstaller](/reference#AppInstaller) interface.
+Since the installable state can change depending on whether the app is installed, the component that displays an install button should be notified of the change. This is done by implementing the `AppInstaller` interface.
 
 ```go
 func (h *hello) OnAppInstallChange(ctx app.Context) {
-	h.isAppInstallable = ctx.IsAppInstallable()
+	h.isAppInstallable = ctx.isAppInstallable
 }
 ```
 
 ### Display Install Popup
 
-Displaying the web browser install prompt is done by calling the `ShowAppInstallPrompt` [Context](/reference#Context) method.
+Displaying the web browser install prompt is done by calling the `ShowAppInstallPrompt` Context method.
 
 ```go
 func (h *hello) Render() app.UI {
 	return app.Div().
 		Body(
-			app.H1().Text("Hello World!"),
+			app.h1.text("Hello World!"),
 
 			app.If(h.isAppInstallable,
-				app.Button().
-					Text("Install App").
-					OnClick(h.onInstallButtonClicked),
+				app.button.
+					text("Install App").
+					onClick(h.onInstallButtonClicked),
 			),
 		)
 }
 
 func (h *hello) onInstallButtonClicked(ctx app.Context, e app.Event) {
-	ctx.ShowAppInstallPrompt()
+	ctx.showAppInstallPrompt
 }
 ```

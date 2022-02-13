@@ -21,7 +21,9 @@ handler := &app.Handler{
 		"/web/static/css/style.css",
 		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/styles/vs.min.css",
 	],
-	Scripts: ["https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"],
+	Scripts: [
+		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js",
+	],
 }
 
 http.handle "/", handler

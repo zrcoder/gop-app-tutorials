@@ -1,10 +1,10 @@
 ## Intro
 
-Testing is an essential step to achieve app reliability. Since go-app is working on 2 different environments (web browser and server), it provides 2 testing [dispatchers](/reference#Dispatcher) to emulate [components lifecycle](/components#lifecycle-events) behaviors.
+Testing is an essential step to achieve app reliability. Since go-app is working on 2 different environments (web browser and server), it provides 2 testing `dispatchers` to emulate [components lifecycle](/components#lifecycle-events) behaviors.
 
 ## Component server prerendering
 
-[Prerendering](/components#prerender) is a component lifecycle step where a component can be initialized on the server-side before being converted into HTML. The server-side environment can be emulated with a dispatcher created with the [NewServerTester()](/reference#NewServerTester) function.
+[Prerendering](/components#prerender) is a component lifecycle step where a component can be initialized on the server-side before being converted into HTML. The server-side environment can be emulated with a dispatcher created with the `NewServerTester()` function.
 
 Here is an example that tests if a component has the expected values after the PreRenderer interface call:
 
@@ -20,9 +20,9 @@ func (t *aTitle) OnPreRender(ctx app.Context) {
 }
 
 func (t *aTitle) Render() app.UI {
-	return app.H1().
-		Class("title").
-		Text(t.title)
+	return app.h1.
+		class("title").
+		text(t.title)
 }
 
 func TestComponentPreRendering(t *testing.T) {
@@ -37,10 +37,10 @@ func TestComponentPreRendering(t *testing.T) {
 	}
 
 	// Call OnPreRender() from PreRenderer interface:
-	disp.PreRender()
+	disp.preRender
 
 	// Executes all the queued UI instructions.
-	disp.Consume()
+	disp.consume
 
 	if compo.title != "Testing Prerendering" {
 		t.Fatal("bad component title:", compo.title)
@@ -50,7 +50,7 @@ func TestComponentPreRendering(t *testing.T) {
 
 ## Component client lifecycle
 
-Like on the [server-side](#testing-component-server-prerendering), testing a component on the client-side is done by emulating the corresponding environment. On the client-side, it is done with the [NewClientTester()](/reference#NewClientTester) function.
+Like on the [server-side](#testing-component-server-prerendering), testing a component on the client-side is done by emulating the corresponding environment. On the client-side, it is done with the `NewClientTester()` function.
 
 Here is an example that tests if a component has the expected values after mounting and navigation:
 
@@ -70,19 +70,19 @@ func (t *aTitle) OnNav(ctx app.Context) {
 }
 
 func (t *aTitle) Render() app.UI {
-	return app.H1().
-		Class("title").
-		Text(t.title)
+	return app.h1.
+		class("title").
+		text(t.title)
 }
 
 func TestComponentLifcycle(t *testing.T) {
 	compo := &aTitle{}
 
-	disp := app.NewClientTester(compo)
+	disp := app.newClientTester(compo)
 	defer disp.Close()
 
-	disp.Nav(&url.URL{})
-	disp.Consume()
+	disp.nav(&url.URL{})
+	disp.consume
 	if compo.title != "Testing Nav" {
 		t.Fatal("bad component title:", compo.title)
 	}
@@ -90,11 +90,11 @@ func TestComponentLifcycle(t *testing.T) {
 }
 ```
 
-See [ClientDispatcher](/reference#ClientDispatcher) for other lifecycle and component extension events.
+See `ClientDispatcher` for other lifecycle and component extension events.
 
 ## Asynchronous operations
 
-Asynchronous operations are started with the context's [Async()](/concurrency#async) method. Once started, they can be awaited during testing with the dispatcher [Wait()](/reference#Dispatcher) method.
+Asynchronous operations are started with the context's [Async()](/concurrency#async) method. Once started, they can be awaited during testing with the dispatcher `Wait()` method.
 
 Here is an example that launches a goroutine and modifies a component field:
 
@@ -106,13 +106,13 @@ type aTitle struct {
 }
 
 func (t *aTitle) Render() app.UI {
-	return app.H1().
-		Class("title").
-		Text(t.title)
+	return app.h1.
+		class("title").
+		text(t.title)
 }
 
 func (t *aTitle) setAsyncTitle(ctx app.Context) {
-	ctx.Async(func() {
+	ctx.async(func() {
 		time.Sleep(time.Millisecond * 100)
 		t.Defer(func(ctx app.Context) {
 			t.title = "Testing Async"
@@ -123,7 +123,7 @@ func (t *aTitle) setAsyncTitle(ctx app.Context) {
 func TestComponentAsync(t *testing.T) {
 	compo := &aTitle{}
 
-	disp := app.NewClientTester(compo)
+	disp := app.newClientTester(compo)
 	defer disp.Close()
 
 	compo.setAsyncTitle(disp.Context()) // Async operation queued.
@@ -132,8 +132,8 @@ func TestComponentAsync(t *testing.T) {
 		t.Fatal("bad component title:", compo.title)
 	}
 
-	disp.Wait()    // Wait for the async operations do complete.
-	disp.Consume() // Apply changes.
+	disp.wait    // Wait for the async operations do complete.
+	disp.consume // Apply changes.
 	if compo.title != "Testing Async" {
 		t.Fatal("bad component title:", compo.title)
 	}
@@ -142,7 +142,7 @@ func TestComponentAsync(t *testing.T) {
 
 ## UI elements
 
-UI elements can be tested with the help of the [TestMatch()](/reference#TestMatch) function and the [TestUIDescriptor](/reference#TestUIDescriptor) struct, by allowing a comparison between matching UI elements.
+UI elements can be tested with the help of the `TestMatch()` function and the `TestUIDescriptor` struct, by allowing a comparison between matching UI elements.
 
 ```go
 func TestMatch(tree UI, d TestUIDescriptor) error
@@ -186,9 +186,9 @@ func (t *aTitle) OnMount(ctx app.Context) {
 }
 
 func (t *aTitle) Render() app.UI {
-	return app.H1().
-		Class("title").
-		Text(t.title)
+	return app.h1.
+		class("title").
+		text(t.title)
 }
 
 func TestUIElement(t *testing.T) {

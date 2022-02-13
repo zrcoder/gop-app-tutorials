@@ -42,7 +42,7 @@ Apps are automatically updated in the background when there are modifications.
 
 Since the displayed version of the app is the cached one, a common scenario is to visually notify the user that an update has been downloaded and that it is available by reloading the page.
 
-This is done by implementing the [AppUpdater](/reference#AppUpdater) interface into a component:
+This is done by implementing the `AppUpdater` interface into a component:
 
 ```go
 // A component that describes a UI.
@@ -56,25 +56,25 @@ type littleApp struct {
 // OnAppUpdate satisfies the app.AppUpdater interface. It is called when the app
 // is updated in background.
 func (a *littleApp) OnAppUpdate(ctx app.Context) {
-	a.updateAvailable = ctx.AppUpdateAvailable() // Reports that an app update is available.
+	a.updateAvailable = ctx.appUpdateAvailable // Reports that an app update is available.
 }
 
 func (a *littleApp) Render() app.UI {
-	return app.Main().Body(
-		app.H1().Text("A little app"),
-		app.P().Text("That only display a text."),
+	return app.main.body(
+		app.h1.text("A little app"),
+		app.p.text("That only display a text."),
 
 		// Displays an Update button when an update is available.
 		app.If(a.updateAvailable,
-			app.Button().
-				Text("Update!").
-				OnClick(a.onUpdateClick),
+			app.button.
+				text("Update!").
+				onClick(a.onUpdateClick),
 		),
 	)
 }
 
 func (a *littleApp) onUpdateClick(ctx app.Context, e app.Event) {
 	// Reloads the page to display the modifications.
-	ctx.Reload()
+	ctx.reload
 }
 ```

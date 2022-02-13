@@ -37,15 +37,6 @@ Here is the code used to create a progressive web app that displays a simple Hel
 ### Hello component
 
 ```go
-package main
-
-import (
-	"log"
-	"net/http"
-
-	"github.com/maxence-charriere/go-app/v9/pkg/app"
-)
-
 // hello is a component that displays a simple "Hello World!". A component is a
 // customizable, independent, and reusable UI element. It is created by
 // embedding app.Compo into a struct.
@@ -56,22 +47,19 @@ type hello struct {
 // The Render method is where the component appearance is defined. Here, a
 // "Hello World!" is displayed as a heading.
 func (h *hello) Render() app.UI {
-	return app.H1().Text("Hello World!")
+	return app.h1.text("Hello World!")
 }
 ```
 
 ### Main
 
 ```go
-// The main function is the entry point where the app is configured and started.
-// It is executed in 2 different environments: A client (the web browser) and a
-// server.
-func main() {
+
 	// The first thing to do is to associate the hello component with a path.
 	//
 	// This is done by calling the Route() function,  which tells go-app what
 	// component to display for a given path, on both client and server-side.
-	app.Route("/", &hello{})
+	app.route "/", &hello{}
 
 	// Once the routes set up, the next thing to do is to either launch the app
 	// or the server that serves the app.
@@ -84,7 +72,7 @@ func main() {
 	// When executed on the server-side, RunWhenOnBrowser() does nothing, which
 	// lets room for server implementation without the need for precompiling
 	// instructions.
-	app.RunWhenOnBrowser()
+	app.runWhenOnBrowser
 
 	// Finally, launching the server that serves the app is done by using the Go
 	// standard HTTP package.
@@ -97,9 +85,7 @@ func main() {
 		Description: "An Hello World! example",
 	})
 
-	if err := http.ListenAndServe(":8000", nil); err != nil {
-		log.Fatal(err)
-	}
+	println http.ListenAndServe(":8000", nil)
 }
 ```
 
@@ -116,23 +102,23 @@ At this point, the package has the following content:
 .
 ├── go.mod
 ├── go.sum
-└── main.go
+├── gop.mod
+└── main.gop
 
-0 directories, 4 files
 ```
 
 ### Build the client
 
 ```bash
-GOARCH=wasm GOOS=js go build -o web/app.wasm
+GOARCH=wasm GOOS=js gop build -o web/app.wasm
 ```
 
-Note that the build output is explicitly set to `web/app.wasm`. The reason why is that the [Handler](/reference#Handler) expects the client to be a **static resource** located at the `/web/app.wasm` path.
+Note that the build output is explicitly set to `web/app.wasm`. The reason why is that the `Handler` expects the client to be a **static resource** located at the `/web/app.wasm` path.
 
 ### Build the server
 
 ```bash
-go build
+gop build
 ```
 
 ### Run the app
@@ -143,12 +129,11 @@ Now the client and server built, the package has the following content:
 .
 ├── go.mod
 ├── go.sum
+├── gop.mod
 ├── hello
-├── main.go
+├── main.gop
 └── web
     └── app.wasm
-
-1 directory, 6 files
 ```
 
 The server is ran with the following command:
@@ -165,8 +150,8 @@ The build process can be simplified by writing a makefile:
 
 ```makefile
 build:
-	GOARCH=wasm GOOS=js go build -o web/app.wasm
-	go build
+	GOARCH=wasm GOOS=js gop build -o web/app.wasm
+	gop build
 
 run: build
 	./hello

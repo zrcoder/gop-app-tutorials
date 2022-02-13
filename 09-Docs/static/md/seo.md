@@ -10,7 +10,7 @@ Go-app is solving that issue by prerendering components on the server-side befor
 
 Prerendering is about converting a [component](/components) to its plain HTML representation.
 
-On the server-side, when the [Handler](/reference#Handler) receives a page request, it creates an instance of the component associated with the requested URL, generates its HTML representation, and includes it on the page.
+On the server-side, when the `Handler` receives a page request, it creates an instance of the component associated with the requested URL, generates its HTML representation, and includes it on the page.
 
 For a simple Hello world component:
 
@@ -20,7 +20,7 @@ type hello struct {
 }
 
 func (h *hello) Render() app.UI {
-	return app.H1().Text("Hello World!")
+	return app.h1.text("Hello World!")
 }
 ```
 
@@ -61,7 +61,7 @@ The generated page will look like the following code:
 
 ### Customizing prerendering
 
-Like on the client-side, a component might require further initializations. Launching additional instructions is done by implementing the [PreRender](/reference#PreRenderer) interface.
+Like on the client-side, a component might require further initializations. Launching additional instructions is done by implementing the `PreRender` interface.
 
 Here is a Hello example that gets the username from an URL parameter:
 
@@ -78,7 +78,7 @@ func (h *hello) OnPreRender(ctx app.Context) {
 }
 
 func (h *hello) Render() app.UI {
-	return app.H1().Text("Hello " + h.name)
+	return app.h1.text("Hello " + h.name)
 }
 ```
 
@@ -86,33 +86,33 @@ func (h *hello) Render() app.UI {
 
 An essential step for a good SEO is to have meta tags, such as page title, well-formed.
 
-Page metadata can be set from the `OnPreRender` [Context](/reference#Context) argument. Context contains a [page](/reference#Page) field to set page metadata. Here is an example that sets the page title and author.
+Page metadata can be set from the `OnPreRender` `Context` argument. Context contains a `page` field to set page metadata. Here is an example that sets the page title and author.
 
 ```go
 func (h *hello) OnPreRender(ctx app.Context) {
-	ctx.Page.SetTitle("A Hello World written with go-app")
-	ctx.Page.SetAuthor("Maxence")
+	ctx.Page.setTitle("A Hello World written with go-app")
+	ctx.Page.setAuthor("Maxence")
 }
 ```
 
-**See the [page reference](/reference#Page) for the detail of customizable metadata**.
+**See the `page reference` for the detail of customizable metadata**.
 
 ### Caching
 
 For performance reasons, prerendered pages are cached once generated.
 
-The [Handler](/reference#Handler) provides a `PreRenderCache` field that allows customizing the cache behavior. By default, it uses an in-memory [LRU cache](<https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)>) that keeps cached data for 24 hours with a maximum size of 8MB.
+The `Handler` provides a `PreRenderCache` field that allows customizing the cache behavior. By default, it uses an in-memory [LRU cache](<https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)>) that keeps cached data for 24 hours with a maximum size of 8MB.
 
-Cache behavior can be customized by setting the PreRendering cache to [another LRU cache](/reference#NewPreRenderLRUCache) with different values:
+Cache behavior can be customized by setting the PreRendering cache to `another LRU cache` with different values:
 
 ```go
 h := app.Handler{
 		Name:           "Hello world",
-		PreRenderCache: app.NewPreRenderLRUCache(100*100000, time.Hour), // 10MB/1hour
+		PreRenderCache: app.newPreRenderLRUCache(100*100000, time.Hour), // 10MB/1hour
 }
 ```
 
-Or any other cache that satisfies the [PreRenderCache](/reference#PreRenderCache) interface:
+Or any other cache that satisfies the `PreRenderCache` interface:
 
 ```go
 type PreRenderCache interface {

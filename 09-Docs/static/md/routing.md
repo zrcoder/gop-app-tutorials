@@ -12,25 +12,21 @@ Routes are defined by using a simple pattern or by a regular expression.
 
 ### Simple route
 
-Simple routes are when a component type matches an exact URL path. They are defined with the [Route()](/reference#Route) function:
+Simple routes are when a component type matches an exact URL path. They are defined with the `Route()` function:
 
 ```go
-func main() {
-	app.Route("/", &hello{})  // hello component type is associated with default path "/".
-	app.Route("/foo", &foo{}) // foo component type is associated with "/foo".
-	app.RunWhenOnBrowser()    // Launches the app when in a web browser.
-}
+app.route "/", &hello{}  // hello component type is associated with default path "/".
+app.route "/foo", &foo{} // foo component type is associated with "/foo".
+app.runWhenOnBrowser    // Launches the app when in a web browser.
 ```
 
 ### Route with regular expression
 
-Routes with regular expressions are when a component type matches an URL path with a given pattern. They are defined with the [RouteWithRegexp()](/reference#RouteWithRegexp)function:
+Routes with regular expressions are when a component type matches an URL path with a given pattern. They are defined with the `RouteWithRegexp()`function:
 
 ```go
-func main() {
-	app.RouteWithRegexp("^/bar.*", &bar) // bar component is associated with all paths that start with /bar.
-	app.RunWhenOnBrowser()               // Launches the app when in a web browser.
-}
+app.routeWithRegexp "^/bar.*", &bar // bar component is associated with all paths that start with /bar.
+app.runWhenOnBrowser               // Launches the app when in a web browser.
 ```
 
 Regular expressions follow [Go standard syntax](https://github.com/google/re2/wiki/Syntax).
@@ -43,7 +39,7 @@ Progressive web apps created with the **go-app** package are working as a [singl
 
 ## Detect navigation
 
-Some scenarios may require additional actions to be done when a page is navigated on. Components can detect when a page is navigated on by implementing the [Navigator](/reference#Navigator) interface:
+Some scenarios may require additional actions to be done when a page is navigated on. Components can detect when a page is navigated on by implementing the `Navigator` interface:
 
 ```go
 type foo struct {
@@ -51,7 +47,7 @@ type foo struct {
 }
 
 func (f *foo) OnNav(ctx app.Context) {
-    fmt.Println("component navigated:", u)
+    println "component navigated:", u
 }
 ```
 

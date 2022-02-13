@@ -26,7 +26,7 @@ The server is what serves the files to make a go-app progressive web app work in
 - [app.wasm](#app-wasm)
 - [Static resources](#static-resources)
 
-It is implemented with the standard [Go HTTP package](https://golang.org/pkg/net/http) and the [Handler](/reference#Handler).
+It is implemented with the standard [Go HTTP package](https://golang.org/pkg/net/http) and the `Handler`.
 
 ## HTML pages
 
@@ -50,7 +50,7 @@ Package resources are the mandatory resources to run a go-app progressive web ap
 | **manifest.webmanifest** | Manifest that describes the progressive web app.        |
 | **app.css**              | go-app widgets styles.                                  |
 
-They are served by the [server](#server)'s go-app [Handler](/reference#Handler) and are accessible from the root of the app domain. Eg: `/app.js`.
+They are served by the [server](#server)'s go-app `Handler` and are accessible from the root of the app domain. Eg: `/app.js`.
 
 ## app.wasm
 

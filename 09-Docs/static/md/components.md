@@ -4,7 +4,7 @@ A component is a customizable, independent, and reusable UI element that allows 
 
 ## Create
 
-Creating a component is done by embedding [Compo](/reference#Compo) into a struct:
+Creating a component is done by embedding `Compo` into a struct:
 
 ```go
 type hello struct {
@@ -14,17 +14,17 @@ type hello struct {
 
 ## Customize Look
 
-Customizing a component look is done by implementing the [Render()](/reference#Composer) method.
+Customizing a component look is done by implementing the `Render()` method.
 
 ```go
 func (h *hello) Render() app.UI {
-	return app.H1().Text("Hello World!")
+	return app.h1.text("Hello World!")
 }
 ```
 
-The code above displays an [H1](/reference#H1) HTML element that shows the `Hello World!` text.
+The code above displays an `H1` HTML element that shows the `Hello World!` text.
 
-`Render()` returns a [UI element](/reference#UI) that can be either an HTML element or another component. Refer to the [Declarative Syntax](/declarative-syntax) topic to know more about how to customize a component look.
+`Render()` returns a `UI element` that can be either an HTML element or another component. Refer to the `Declarative Syntax` topic to know more about how to customize a component look.
 
 ## Fields
 
@@ -37,7 +37,7 @@ type hello struct {
 }
 
 func (h *hello) Render() app.UI {
-	return app.Div().Text("Hello, " + h.Name) // The Name field is display after "Hello, "
+	return app.div.text("Hello, " + h.Name) // The Name field is display after "Hello, "
 }
 ```
 
@@ -47,7 +47,7 @@ In addition to the [Go distinction between exported and unexported fields](https
 
 When a UI element update is triggered (done internally), a UI element tree is rendered and compared to the currently displayed one. When 2 child components of the same type are compared to check differences, the comparison is based on the value of exported fields.
 
-Here is a pseudo-Go code that illustrates how it works internally:
+Here is a pseudo-Go+ code that illustrates how it works internally:
 
 ```go
 type hello struct {
@@ -68,11 +68,11 @@ func updateFromExportedField() {
 		unexportedName: "Erin",
 	}
 
-	update(app.Div().Body(current), app.Div().Body(new))
+	update app.div.body(current), app.div.body(new)
 
-    // Current component exported field is updated:
-	fmt.Println("current exported name:" + current.ExportedName)     // Updated:     "Maxence"
-	fmt.Println("current unexported name:" + current.unexportedName) // Not Updated: "Eric"
+	// Current component exported field is updated:
+	println "current exported name:"+current.ExportedName     // Updated:     "Maxence"
+	println "current unexported name:"+current.unexportedName // Not Updated: "Eric"
 }
 
 func updateFromUnexportedField() {
@@ -86,11 +86,11 @@ func updateFromUnexportedField() {
 		unexportedName: "Erin",
 	}
 
-	update(app.Div().Body(current), app.Div().Body(new))
+	update app.div.body(current), app.div.body(new)
 
 	// Current component is not updated (no different exported field value):
-	fmt.Println("current exported name:" + current.ExportedName)     // Not Updated: "Max"
-	fmt.Println("current unexported name:" + current.unexportedName) // Not Updated: "Eric"
+	println "current exported name:"+current.ExportedName     // Not Updated: "Max"
+	println "current unexported name:"+current.unexportedName // Not Updated: "Eric"
 }
 ```
 
@@ -115,7 +115,7 @@ It is possible to trigger instructions when those different steps happen by impl
 
 A component is prerendered when it is used on the server-side to generate HTML markup that is included in a requested HTML page, allowing search engines to index contents created with go-app.
 
-Custom actions can be performed by implementing the [PreRenderer](/reference#PreRenderer) interface:
+Custom actions can be performed by implementing the `PreRenderer` interface:
 
 ```go
 type foo struct {
@@ -123,7 +123,7 @@ type foo struct {
 }
 
 func (f *foo) OnPreRender(ctx app.Context) {
-    fmt.Println("component prerendered")
+	println "component prerendered"
 }
 ```
 
@@ -131,7 +131,7 @@ func (f *foo) OnPreRender(ctx app.Context) {
 
 A component is mounted when it is inserted into the webpage DOM.
 
-Custom actions can be performed by implementing the [Mounter](/reference#Mounter) interface:
+Custom actions can be performed by implementing the `Mounter` interface:
 
 ```go
 type foo struct {
@@ -139,7 +139,7 @@ type foo struct {
 }
 
 func (f *foo) OnMount(ctx app.Context) {
-    fmt.Println("component mounted")
+    println "component mounted"
 }
 ```
 
@@ -147,7 +147,7 @@ func (f *foo) OnMount(ctx app.Context) {
 
 A component is navigated when a page is loaded, reloaded, or navigated from an anchor link or an HREF change. It can occur multiple times during a component life.
 
-Custom actions can be performed by implementing the [Navigator](/reference#Navigator) interface:
+Custom actions can be performed by implementing the `Navigator` interface:
 
 ```go
 type foo struct {
@@ -155,7 +155,7 @@ type foo struct {
 }
 
 func (f *foo) OnNav(ctx app.Context) {
-    fmt.Println("component navigated:", u)
+    println "component navigated:", u
 }
 ```
 
@@ -163,7 +163,7 @@ func (f *foo) OnNav(ctx app.Context) {
 
 A component is dismounted when it is removed from the webpage DOM.
 
-Custom actions can be performed by implementing the [Dismounter](/reference#Dismounter) interface:
+Custom actions can be performed by implementing the `Dismounter` interface:
 
 ```go
 type foo struct {
@@ -171,7 +171,7 @@ type foo struct {
 }
 
 func (f *foo) OnDismount() {
-    fmt.Println("component dismounted")
+    println "component dismounted"
 }
 ```
 
@@ -181,14 +181,14 @@ Here is a list of all the component lifecycle events available:
 
 | Interface                               | Description                                               | Frequency                        |
 | --------------------------------------- | --------------------------------------------------------- | -------------------------------- |
-| [PreRenderer](/reference#PreRenderer)   | Listen to component prerendering.                         | Once on server-side              |
-| [Mounter](/reference#Mounter)           | Listen to component mounting.                             | Once on client-side              |
-| [Dismounter](/reference#Dismounter)     | Listen to component dismounting.                          | Once                             |
-| [Navigator](/reference#Navigator)       | Listen to page navigation.                                | Once                             |
-| [Updater](/reference#Updater)           | Listen to component update triggered by a parent element. | Can occur multiple times         |
-| [AppUpdater](/reference#AppUpdater)     | Listen to available app update.                           | Can occur once                   |
-| [AppInstaller](/reference#AppInstaller) | Listen to whether an app is installable.                  | Can occur once                   |
-| [Resizer](/reference#Resizer)           | Listen to the app and parent components resizes.          | Each time a component is resized |
+| `PreRenderer`   | Listen to component prerendering.                         | Once on server-side              |
+| `Mounter`           | Listen to component mounting.                             | Once on client-side              |
+| `Dismounter`    | Listen to component dismounting.                          | Once                             |
+| `Navigator`       | Listen to page navigation.                                | Once                             |
+| `Updater`           | Listen to component update triggered by a parent element. | Can occur multiple times         |
+| `AppUpdater`     | Listen to available app update.                           | Can occur once                   |
+| `AppInstaller`| Listen to whether an app is installable.                  | Can occur once                   |
+| `Resizer`           | Listen to the app and parent components resizes.          | Each time a component is resized |
 
 ## Updates
 
@@ -200,13 +200,13 @@ When this is happening, go-app internally starts an update mechanism that checks
 
 - [Component lifecycle events](#lifecycle-events-reference)
 - [HTML event handlers](/declarative-syntax#event-handlers)
-- [Context.Dispatch](/reference#Context.Dispatch)
-- [Context.Handle](/reference#Context.Handler)
-- [Context.ObserveState](/reference#Context.ObserveState)
+- `Context.Dispatch`
+- `Context.Handle]`
+- `Context.ObserveState`
 
 ### Manually Trigger an Update
 
-In the event where it is not automatically triggered with your use case, the component update mechanism can be manually launched by using [Compo.Update](/reference#Compo.Update).
+In the event where it is not automatically triggered with your use case, the component update mechanism can be manually launched by using `Compo.Update`.
 
 ```go
 type myCompo struct {
@@ -216,12 +216,12 @@ type myCompo struct {
 }
 
 func (c *myCompo) Render() app.UI {
-	return app.Div().Text(c.Number)
+	return app.div.text(c.Number)
 }
 
 func (c *myCompo) customTrigger() {
 	c.Number = rand.Intn(42)
-	c.Update() // Manual updated trigger
+	c.update // Manual updated trigger
 }
 ```
 
@@ -231,7 +231,7 @@ func (c *myCompo) customTrigger() {
 
 The component now displays the username in its title and provides input for the user to type his/her name. When the user does so, an event handler is called and the name is stored in the component field named `name`.
 
-The **[Update()](/reference#Composer) method call is what tells the component that its state changed and that its appearance must be updated**.
+The **`Update()` method call is what tells the component that its state changed and that its appearance must be updated**.
 
 It internally triggers the `Render()` method and performs a diff with the current component state in order to define and process the changes. Here is how rendering diff behave:
 

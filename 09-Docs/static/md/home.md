@@ -1,6 +1,6 @@
-## What is go-app?
+## What is `app`?
 
-Go-app is a package for **building [progressive web apps (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) with the [Go programming language (Golang)](https://golang.org) and [WebAssembly (Wasm)](https://webassembly.org)**.
+`app` is a package for **building [progressive web apps (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) with the [Go+](https://goplus.org) programming language and [WebAssembly (Wasm)](https://webassembly.org)**.
 
 Shaping a UI is done by using a **declarative syntax that creates and composes HTML elements only by using the Go programing language**.
 
@@ -10,35 +10,27 @@ Shaping a UI is done by using a **declarative syntax that creates and composes H
 
 ## Declarative Syntax
 
-Go-app uses a declarative syntax so you can **write reusable component-based UI elements just by using the Go programming language**.
+We uses a declarative syntax so you can **write reusable component-based UI elements just by using the Go programming language**.
 
 ```go
 // A component that displays a Hello world by composing with HTML elements,
 // conditions, and binding.
-type hello struct {
+type Hello struct {
 	app.Compo
 
-	name string
+	greeting string
 }
 
-func (h *hello) Render() app.UI {
-	return app.Div().Body(
-		app.H1().Body(
-			app.Text("Hello, "),
-			app.If(h.name != "",
-				app.Text(h.name),
+func (h *Hello) Render() app.UI {
+	return app.div.body(
+		app.h1.body(
+			app.If(h.greeting == "",
+				app.text("Hello, world!"),
 			).Else(
-				app.Text("World!"),
+				app.text("Hello "+h.greeting+"!"),
 			),
 		),
-		app.P().Body(
-			app.Input().
-				Type("text").
-				Value(h.name).
-				Placeholder("What is your name?").
-				AutoFocus(true).
-				OnChange(h.ValueTo(&h.name)),
-		),
+		app.input.onChange(app.valueTo(&h.greeting)),
 	)
 }
 ```
@@ -48,22 +40,12 @@ func (h *hello) Render() app.UI {
 Serving an app built with go-app is done by using the [Go standard HTTP model](https://golang.org/pkg/net/http).
 
 ```go
-func main() {
-    // Go-app component routing (client-side):
-	app.Route("/", &hello{})
-	app.Route("/hello", &hello{})
-	app.RunWhenOnBrowser()
+app.route "/", &Hello{}
+app.runWhenOnBrowser
 
-    // Standard HTTP routing (server-side):
-	http.Handle("/", &app.Handler{
-		Name:        "Hello",
-		Description: "An Hello World! example",
-	})
-
-	if err := http.ListenAndServe(":8000", nil); err != nil {
-		log.Fatal(err)
-	}
-}
+http.handle "/", &app.Handler{}
+println "serving on [http://localhost:9990]"
+println http.listenAndServe(":9990", nil)
 ```
 
 ## Other Features

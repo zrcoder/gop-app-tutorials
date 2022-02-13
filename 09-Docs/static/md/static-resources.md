@@ -20,7 +20,7 @@ You will find below a couple of examples about how static resources are referred
 
 ### In Handler
 
-Static resources used in a [Handler](/reference#Handler) are usually icons, CSS, and Javascript files.
+Static resources used in a `Handler` are usually icons, CSS, and Javascript files.
 
 ```go
 http.Handle("/", &app.Handler{
@@ -43,9 +43,9 @@ http.Handle("/", &app.Handler{
 
 ```go
 func (f *foo) Render() app.UI {
-	return app.Img().
-		Alt("An image").
-		Src("/web/foo.png") // Specify image source to foo.png.
+	return app.img.
+		alt("An image").
+		src("/web/foo.png") // Specify image source to foo.png.
 }
 ```
 
@@ -67,7 +67,7 @@ By default, the web directory is located next to the server binary.
     └── ... # Static resources.
 ```
 
-The location of the web directory is changed by setting the [Handler](/reference#Handler) with a [LocalDir](/reference#LocalDir) resource provider:
+The location of the web directory is changed by setting the `Handler` with a `LocalDir` resource provider:
 
 ```go
 http.Handle("/", &app.Handler{
@@ -77,11 +77,11 @@ http.Handle("/", &app.Handler{
 })
 ```
 
-In the example above, static resources will be located in `/tmp/web/`, but still accessed from `/web/` when referred elsewhere in the [Handler](/reference#Handler) and within components.
+In the example above, static resources will be located in `/tmp/web/`, but still accessed from `/web/` when referred elsewhere in the `Handler` and within components.
 
 ### Setup remote web directory
 
-When deployed on a cloud provider, it is a common practice to put static resources in a storage service such as [S3](https://aws.amazon.com/s3) or [Google Cloud Storage](https://cloud.google.com/storage). In this scenario, changing the web directory to a remote bucket is done by using the [RemoteBucket](/reference#RemoteBucket) resource provider.
+When deployed on a cloud provider, it is a common practice to put static resources in a storage service such as [S3](https://aws.amazon.com/s3) or [Google Cloud Storage](https://cloud.google.com/storage). In this scenario, changing the web directory to a remote bucket is done by using the `RemoteBucket` resource provider.
 
 ```go
 http.Handle("/", &app.Handler{
@@ -91,6 +91,6 @@ http.Handle("/", &app.Handler{
 })
 ```
 
-In the example above, static resources are located in the [Google Cloud Storage](https://cloud.google.com/storage) bucket, at the `https://storage.googleapis.com/myapp.appspot.com` URL. Static resources will still referred from `/web/` elsewhere in the [Handler](/reference#Handler) and within components.
+In the example above, static resources are located in the [Google Cloud Storage](https://cloud.google.com/storage) bucket, at the `https://storage.googleapis.com/myapp.appspot.com` URL. Static resources will still referred from `/web/` elsewhere in the `Handler` and within components.
 
 You may also have to configure the remote bucket to avoid [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) issues.
