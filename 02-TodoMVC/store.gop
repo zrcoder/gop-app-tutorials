@@ -1,3 +1,11 @@
+import (
+	"encoding/json"
+
+	"gop-app-tutorials/log"
+
+	"github.com/zrcoder/app"
+)
+
 type Item struct {
 	Title     string
 	Completed bool
@@ -12,6 +20,76 @@ const (
 )
 
 var (
-	Items  []*Item
+	Items              = []*Item{}
 	Filter FilterState = All
 )
+
+func Store() {
+	storage := app.window.get("localStorage")
+	data, _ := json.marshal(Items)
+	storage.set("todoItems", string(data))
+}
+
+func Restore() {
+	storage := app.window.get("localStorage")
+	value := storage.get("todoItems")
+	if value.isUndefined {
+		return
+	}
+	data := []byte(value.String())
+	err := json.unmarshal(data, &Items)
+	if err != nil {
+		log.println err
+	}
+}
+
+func ItemsCount() int {
+	return len(Items)
+}
+
+func ActiveItemsCount() int {
+	res := 0
+	for item <- Items, !item.Completed {
+		res++
+	}
+	return res
+}
+
+func CompletedItemsCount() int {
+	return len(Items) - ActiveItemsCount()
+}
+
+func GetItem(index int) *Item {
+	return Items[index]
+}
+
+func Range(f func(int, *Item)) {
+	for i, v := range Items {
+		f(i, v)
+	}
+}
+
+func AddItem(title string) {
+	Items = append(Items, &Item{Title: title})
+	Store()
+}
+
+func ToggleItemState(index int) {
+	Items[index].Completed = !Items[index].Completed
+	Store()
+}
+
+func ModifyItem(index int, title string) {
+	Items[index].Title = title
+	Store()
+}
+
+func DeleteItem(index int) {
+	Items = append(Items[:index], Items[index+1:]...)
+	Store()
+}
+
+func ClearCompleted() {
+	Items = [item for item <- Items, !item.Completed]
+	Store()
+}

@@ -6,6 +6,8 @@ import (
 	"github.com/zrcoder/app"
 )
 
+Restore()
+
 app.route "/", &Page{}
 app.runWhenOnBrowser
 

@@ -7,7 +7,6 @@ import (
 type ItemView struct {
 	app.Compo
 
-	Item  *Item
 	Index int
 
 	isEditing bool
@@ -15,7 +14,8 @@ type ItemView struct {
 
 func (p *ItemView) Render() app.UI {
 	completed, editing := "", ""
-	if p.Item.Completed {
+	item := GetItem(p.Index)
+	if item.Completed {
 		completed = "completed"
 	}
 	if p.isEditing {
@@ -23,16 +23,16 @@ func (p *ItemView) Render() app.UI {
 	}
 	return app.li.class(completed).class(editing).body(
 		app.div.class("view").body(
-			app.input.Type("checkbox").class("toggle").checked(p.Item.Completed).onChange(p.onCheckBoxClick),
-			app.label.text(p.Item.Title).onDblClick(p.onStartEdit),
+			app.input.Type("checkbox").class("toggle").checked(item.Completed).onChange(p.onCheckBoxClick),
+			app.label.text(item.Title).onDblClick(p.onStartEdit),
 			app.button.class("destroy").onClick(p.onDelete),
 		),
-		app.input.class("edit").value(p.Item.Title).onChange(p.onStopEdit).onBlur(p.onStopEdit),
+		app.input.class("edit").value(item.Title).onChange(p.onStopEdit).onBlur(p.onStopEdit),
 	)
 }
 
 func (p *ItemView) onCheckBoxClick(ctx app.Context, e app.Event) {
-	p.Item.Completed = !p.Item.Completed
+	ToggleItemState(p.Index)
 }
 
 func (p *ItemView) onStartEdit(ctx app.Context, e app.Event) {
@@ -41,10 +41,10 @@ func (p *ItemView) onStartEdit(ctx app.Context, e app.Event) {
 
 func (p *ItemView) onStopEdit(ctx app.Context, e app.Event) {
 	p.isEditing = false
-	p.Item.Title = ctx.jsSrc.get("value").string
+	ModifyItem(p.Index, ctx.jsSrc.get("value").string)
 }
 
 func (p *ItemView) onDelete(ctx app.Context, e app.Event) {
-	log.println "delete item:", p.Index, p.Item.Title
-	Items = append(Items[:p.Index], Items[p.Index+1:]...)
+	log.println "delete item:", p.Index
+	DeleteItem(p.Index)
 }

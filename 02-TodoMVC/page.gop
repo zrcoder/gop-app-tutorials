@@ -12,7 +12,7 @@ func (p *Page) Render() app.UI {
 	return app.div.body(
 		app.section.class("todoapp").body(
 			p.header(),
-			app.If(len(Items) > 0,
+			app.If(ItemsCount() > 0,
 				p.itemList(),
 				p.footer(),
 			),
@@ -33,18 +33,18 @@ func (p *Page) header() app.UI {
 
 func (p *Page) onHeaderInputChange(ctx app.Context, e app.Event) {
 	title := ctx.jsSrc.get("value").string
-	Items = append(Items, &Item{Title: title})
+	AddItem(title)
 	ctx.jsSrc.set("value", "")
 }
 
 func (p *Page) itemList() app.UI {
 	var itemViews []*ItemView
-	for i, item := range Items {
+	Range(func(index int, item *Item) {
 		if (Filter == Active && item.Completed) || (Filter == Completed && !item.Completed) {
-			continue
+			return
 		}
-		itemViews = append(itemViews, &ItemView{Index: i, Item: item})
-	}
+		itemViews = append(itemViews, &ItemView{Index: index})
+	})
 	return app.section.class("main").body(
 		app.ul.class("todo-list").body(
 			app.Range(itemViews).slice(func(i int) app.UI {
@@ -55,15 +55,12 @@ func (p *Page) itemList() app.UI {
 }
 
 func (p *Page) footer() app.UI {
-	lefts := 0
-	for item <- Items, !item.Completed {
-		lefts++
-	}
+	lefts := ActiveItemsCount()
 	itemsLeftText := " items left"
 	if lefts == 1 {
 		itemsLeftText = " item left"
 	}
-	completed := len(Items) - lefts
+	completed := ItemsCount() - lefts
 
 	return app.footer.class("footer").body(
 		app.span.class("todo-count").body(
@@ -84,7 +81,7 @@ func (p *Page) footer() app.UI {
 }
 
 func (p *Page) onClearCompleted(ctx app.Context, e app.Event) {
-	Items = [item for item <- Items, !item.Completed]
+	ClearCompleted()
 }
 
 func (p *Page) info() app.UI {
