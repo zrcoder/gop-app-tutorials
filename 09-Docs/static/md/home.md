@@ -1,12 +1,10 @@
-## What is `app`?
+## What is app?
 
 `app` is a package for **building [progressive web apps (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) with the [Go+](https://goplus.org) programming language and [WebAssembly (Wasm)](https://webassembly.org)**.
 
 Shaping a UI is done by using a **declarative syntax that creates and composes HTML elements only by using the Go programing language**.
 
 **Served with Go standard HTTP model**, apps created with go-app are **SEO friendly, installable, and support offline mode**.
-
-
 
 ## Declarative Syntax
 
@@ -17,21 +15,10 @@ We uses a declarative syntax so you can **write reusable component-based UI elem
 // conditions, and binding.
 type Hello struct {
 	app.Compo
-
-	greeting string
 }
 
 func (h *Hello) Render() app.UI {
-	return app.div.body(
-		app.h1.body(
-			app.If(h.greeting == "",
-				app.text("Hello, world!"),
-			).Else(
-				app.text("Hello "+h.greeting+"!"),
-			),
-		),
-		app.input.onChange(app.valueTo(&h.greeting)),
-	)
+	return app.h1.text("Hello, world!")
 }
 ```
 

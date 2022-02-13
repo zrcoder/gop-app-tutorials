@@ -1,7 +1,7 @@
 # Gop app tutorials 
 Tutorials of writing web apps in Go+ language.
 
-## Requires
+## Prerequisite
 Look at the `go.mod`/`gop.mod` files, version of Go and Go+ required are:
 
 ```

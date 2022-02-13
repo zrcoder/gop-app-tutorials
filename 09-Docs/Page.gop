@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	githubURL = "https://github.com/zrcoder/gop-app-tutorials"
+	githubURL = "https://github.com/zrcoder/app"
 )
 
 type Page struct {

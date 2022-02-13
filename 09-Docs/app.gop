@@ -1,5 +1,6 @@
 import (
 	"net/http"
+	"os"
 
 	"gop-app-tutorials/log"
 
@@ -24,8 +25,14 @@ handler := &app.Handler{
 	Scripts: [
 		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js",
 	],
+	Version: "v0.4",
 }
 
-http.handle "/", handler
-log.println "serving on [http://localhost:9999]"
-log.println http.listenAndServe(":9999", nil)
+if len(os.Args) > 1 && os.Args[1] == "genSite" {
+	log.IsDev = false
+	println app.generateStaticWebsite(".", handler)
+} else {
+	http.handle "/", handler
+	log.println "serving on [http://localhost:9999]"
+	log.println http.listenAndServe(":9999", nil)
+}
