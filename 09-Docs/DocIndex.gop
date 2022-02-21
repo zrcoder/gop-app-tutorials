@@ -1,14 +1,25 @@
 import (
+	"bytes"
+	"fmt"
 	"strings"
 
+	"github.com/gomarkdown/markdown"
+	"github.com/gomarkdown/markdown/html"
+	"github.com/gomarkdown/markdown/parser"
 	"github.com/zrcoder/app"
 	"github.com/zrcoder/app/ui"
 )
 
+type Index struct {
+	Title string
+	Href  string
+	Level int
+}
+
 type DocIndex struct {
 	app.Compo
 
-	Ititles []string
+	Indexes []Index
 }
 
 func newDocIndex() *DocIndex {
@@ -16,55 +27,75 @@ func newDocIndex() *DocIndex {
 }
 
 func (p *DocIndex) Data(data []byte) *DocIndex {
-	src := string(data)
-	lines := strings.Split(src, "\n")
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
+	parser := parser.NewWithExtensions(extensions)
+	htmlFlags := html.TOC
+	opts := html.RendererOptions{Flags: htmlFlags}
+	renderer := html.NewRenderer(opts)
+	data = markdown.ToHTML(data, parser, renderer)
+
+	htmlStr := string(data)
+	htmlStr = strings.trimSpace(htmlStr)
+	const tocStart = `<nav>`
+	const tocTail = `</nav>`
+	if !strings.hasPrefix(htmlStr, tocStart) || !strings.contains(htmlStr, tocTail) {
+		return p
+	}
+	htmlStr = htmlStr[len(tocStart):strings.index(htmlStr, tocTail)]
+
+	between := func(s, first, second string) string {
+		i, j := strings.index(s, first), strings.index(s, second)
+		if i == -1 || j == -1 || i >= j {
+			return ""
+		}
+		return s[i+len(first) : j]
+	}
+
+	lines := strings.split(htmlStr, "\n")
+	level := 0
 	for _, line := range lines {
 		line = strings.trimSpace(line)
-		i := strings.index(line, " ")
-		if i < 0 || !isHeadingPrefix(line[:i]) {
+		if line == `<ul>` {
+			level++
 			continue
 		}
-		title := strings.trimSpace(line[i+1:])
-		p.Ititles = append(p.Ititles, indent(title, i))
+		if line == `</ul>` {
+			level--
+			continue
+		}
+		herf := between(line, `<a href="`, `">`)
+		title := between(line, `">`, `</a>`)
+		if herf == "" || title == "" {
+			continue
+		}
+		p.Indexes = append(p.Indexes, Index{Level: level, Title: title, Href: herf})
 	}
+
 	return p
 }
 
-func isHeadingPrefix(s string) bool {
-	return len(s) == strings.count(s, "#")
+func (p *DocIndex) Render() app.UI {
+	return app.div.class("fill").body(
+		app.If(p.Indexes != nil,
+			app.Range(p.Indexes).slice(func(i int) app.UI {
+				index := p.Indexes[i]
+				focus := ""
+				if app.window.URL().Fragment == index.Href[1:] {
+					focus = "focus"
+				}
+				return ui.link.class(focus).class("link index-link").label(p.makeTitle(index)).href(index.Href)
+			}),
+		),
+	)
 }
 
-func indent(s string, n int) string {
-	n -= 2
+func (p *DocIndex) makeTitle(index Index) string {
+	n := index.Level - 1
 	buf := strings.Builder{}
 	for n > 0 {
 		buf.writeString("  ")
 		n--
 	}
-	buf.writeString(s)
-	return buf.string
-}
-
-func (p *DocIndex) Render() app.UI {
-	return app.div.class("fill").body(
-		app.Range(p.Ititles).slice(func(i int) app.UI {
-			title := p.Ititles[i]
-			fragment := titleToFragment(title)
-			href := "#" + fragment
-			focus := ""
-			if app.Window().URL().Fragment == fragment {
-				focus = "focus"
-			}
-			return ui.link.class(focus).class("link heading index-link").label(title).href(href)
-		}),
-	)
-}
-
-func titleToFragment(v string) string {
-	v = strings.TrimSpace(v)
-	v = strings.ToLower(v)
-	v = strings.ReplaceAll(v, " ", "-")
-	v = strings.ReplaceAll(v, ".", "-")
-	v = strings.ReplaceAll(v, "?", "")
-	return v
+	buf.writeString(index.Title)
+	return buf.String()
 }

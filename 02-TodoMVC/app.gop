@@ -1,8 +1,4 @@
 import (
-	"net/http"
-
-	"gop-app-tutorials/log"
-
 	"github.com/zrcoder/app"
 )
 
@@ -11,13 +7,12 @@ Restore()
 app.route "/", &Page{}
 app.runWhenOnBrowser
 
-http.handle "/", &app.Handler{
+handler := &app.Handler{
 	Name:         "Todos",
-	Title:        "Go+ :: TodoMVC",
+	Title:        "Go+ APP:: TodoMVC",
 	Icon:         app.Icon{Default: "/web/static/logo.png"},
 	LoadingLabel: "Todos",
 	Author:       "zrcoder",
 	Styles:       ["/web/static/style.css"],
 }
-log.println "serving on [http://localhost:9991]"
-log.println http.listenAndServe(":9991", nil)
+println "generate static website, error:", app.generateStaticWebsite(".", handler)

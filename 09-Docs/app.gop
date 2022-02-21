@@ -1,38 +1,37 @@
 import (
-	"net/http"
 	"os"
-
-	"gop-app-tutorials/log"
 
 	"github.com/zrcoder/app"
 )
 
-// each document will make an anction to get markdown, so register a global handler here
-app.handle GetMarkdownActionKey, HandleGetMarkdown
-app.route "/", &Page{}
-app.runWhenOnBrowser
-
-handler := &app.Handler{
+var Handler = &app.Handler{
 	Name:         "GO+ APP Docs",
 	Title:        "GO+ APP :: Docs",
 	Icon:         app.Icon{Default: "/web/static/images/calf.png"},
 	LoadingLabel: "GO+ APP Docs",
 	Author:       "zrcoder",
 	Styles: [
-		"/web/static/css/style.css",
-		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/styles/vs.min.css",
+		"/web/static/css/main.css",
+		"/web/static/css/markdown.css",
+		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/styles/github.min.css",
 	],
 	Scripts: [
 		"https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js",
 	],
-	Version: "v0.4",
+	CacheableResources: [
+		"/web/static/md",
+	],
+	Version: "v0.6",
 }
 
-if len(os.Args) > 1 && os.Args[1] == "genSite" {
-	log.IsDev = false
-	println app.generateStaticWebsite(".", handler)
-} else {
-	http.handle "/", handler
-	log.println "serving on [http://localhost:9999]"
-	log.println http.listenAndServe(":9999", nil)
+// each document will make an anction to get markdown, so register a global handler here
+app.handle GetMarkdownActionKey, HandleGetMarkdown
+app.route "/", &Page{}
+app.runWhenOnBrowser
+
+// gen static site
+if len(os.Args) > 1 { // for github/gitee
+	Handler.Resources = app.customProvider("", os.Args[1])
 }
+
+println "generate static website, error:", app.generateStaticWebsite(".", Handler)

@@ -45,7 +45,7 @@ func (m *Menu) Render() app.UI {
 	)
 }
 
-const linkClass = "link heading fit unselectable"
+const linkClass = "link fit"
 
 func (m *Menu) newLink(svg, title, doc string) app.UI {
 	focusClass := ""

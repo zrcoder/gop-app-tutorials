@@ -12,13 +12,15 @@ go+ 1.0
 ## How to run
 
 ```shell
-make dir=${tutorial dir} run
+cd ${tutorial dir}
+make run ${port}
 ```
 
 > For example:
 >
 > ```shell
-> make run dir=01-HellowWorld
+> cd 01-HellowWorld
+> make run port=9990
 > ```
 > and there will be a log like below:
 > ```

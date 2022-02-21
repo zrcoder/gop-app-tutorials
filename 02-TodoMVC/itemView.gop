@@ -1,6 +1,4 @@
 import (
-	"gop-app-tutorials/log"
-
 	"github.com/zrcoder/app"
 )
 
@@ -45,6 +43,5 @@ func (p *ItemView) onStopEdit(ctx app.Context, e app.Event) {
 }
 
 func (p *ItemView) onDelete(ctx app.Context, e app.Event) {
-	log.println "delete item:", p.Index
 	DeleteItem(p.Index)
 }

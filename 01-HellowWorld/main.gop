@@ -1,6 +1,4 @@
 import (
-	"net/http"
-
 	"github.com/zrcoder/app"
 )
 
@@ -26,6 +24,4 @@ func (h *Hello) Render() app.UI {
 app.route "/", &Hello{}
 app.runWhenOnBrowser
 
-http.handle "/", &app.Handler{}
-println "serving on [http://localhost:9990]"
-println http.listenAndServe(":9990", nil)
+println "generate static website, error:", app.generateStaticWebsite(".", &app.Handler{})

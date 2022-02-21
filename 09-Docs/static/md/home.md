@@ -1,4 +1,4 @@
-## What is app?
+## Write front-end with Go+
 
 `app` is a package for **building [progressive web apps (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps) with the [Go+](https://goplus.org) programming language and [WebAssembly (Wasm)](https://webassembly.org)**.
 

@@ -1,7 +1,6 @@
 import (
 	"encoding/json"
-
-	"gop-app-tutorials/log"
+	"log"
 
 	"github.com/zrcoder/app"
 )

@@ -17,11 +17,11 @@ func newDocContent() *DocContent {
 }
 
 func (d *DocContent) Data(v []byte) *DocContent {
-	d.Icontent = fmt.Sprintf(`<div class="markdown">%s</div>`, parseMarkdown(v))
+	d.Icontent = fmt.Sprintf(`<div class="markdown-body">%s</div>`, d.parseMarkdown(v))
 	return d
 }
 
-func parseMarkdown(md []byte) []byte {
+func (d *DocContent) parseMarkdown(md []byte) []byte {
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	parser := parser.NewWithExtensions(extensions)
 	return markdown.ToHTML(md, parser, nil)
@@ -37,7 +37,10 @@ func (d *DocContent) OnUpdate(ctx app.Context) {
 }
 
 func (d *DocContent) highlightCode(ctx app.Context) {
-	app.Window().Get("hljs").Call("highlightAll")
+	hl := app.Window().Get("hljs")
+	if hl.truthy {
+		hl.Call("highlightAll")
+	}
 }
 
 func (d *DocContent) Render() app.UI {

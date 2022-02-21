@@ -2,22 +2,16 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"gop-app-tutorials/log"
-
 	"github.com/zrcoder/app"
 	"github.com/zrcoder/app/errors"
 )
 
 func HandleGetMarkdown(ctx app.Context, a app.Action) {
-	log.println "begion to get md"
 	path := a.Tags.Get("path")
 	if path == "" {
-		log.println errors.New("getting markdown failed").
-			Tag("reason", "empty path")
 		return
 	}
 
-	log.println "md path:", path
 	state := path
 	var md MarkdownContent
 	ctx.GetState(state, &md)

@@ -1,6 +1,4 @@
 import (
-	"gop-app-tutorials/log"
-
 	"github.com/zrcoder/app"
 	"github.com/zrcoder/app/ui"
 )
@@ -32,7 +30,7 @@ func (p *Page) Render() app.UI {
 			ui.scroll.class("fill").headerHeight(headerHeight).
 				header(
 					ui.stack.class("fill").right.middle.content(
-						ui.link.class("link heading fit").icon(githubSVG).label("Github").href(githubURL),
+						ui.link.class("link fit").icon(githubSVG).label("Github").href(githubURL),
 					),
 				).
 				content(

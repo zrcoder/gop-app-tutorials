@@ -1,6 +1,4 @@
 import (
-	"gop-app-tutorials/log"
-
 	"github.com/zrcoder/app"
 	"github.com/zrcoder/app/ui"
 )
@@ -25,7 +23,12 @@ func newDocLoader() *DocLoader {
 }
 
 func (d *DocLoader) Doc(doc string) *DocLoader {
-	d.Isrc = "/web/static/md/" + doc + ".md"
+	if Handler.Resources == nil {
+		d.Isrc = "/web/static/md/" + doc + ".md"
+	} else {
+		d.Isrc = Handler.Resources.Static() + "/web/static/md/" + doc + ".md"
+	}
+
 	return d
 }
 
@@ -66,7 +69,7 @@ func scrollTo(ctx app.Context) {
 
 func (d *DocLoader) Render() app.UI {
 	return app.div.body(
-		ui.loader.class("heading fill").loading(d.md.Status == Loading).err(d.md.Err).label("loading..."),
+		ui.loader.class("fill").loading(d.md.Status == Loading).err(d.md.Err).label("loading..."),
 		app.If(d.md.Status == Loaded,
 			app.If(d.iRenderType == DocRenderTypeIndex,
 				newDocIndex().data(d.md.Data),

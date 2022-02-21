@@ -1,0 +1,89 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+  }
+
+.fill {
+    height: 100%;
+    width: 100%;
+    max-height: 100%;
+    max-width: 100%;
+  }
+
+  .link {
+    display: block;
+    cursor: pointer;
+    transition: 0.2s all;
+    color: currentColor;
+  }
+  
+  .link:hover {
+    color: #0969da;
+    transform: scale(1.2);
+  }
+  
+  .link:active {
+    color: #0969da;
+    transform: scale(0.98);
+  }
+  
+  .link-update {
+    animation-timing-function: ease;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-name: bounce;
+    transform-origin: bottom;
+  }
+  
+  .link-update .link-icon {
+    margin-right: 3px;
+  }
+
+  a {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .focus {
+    color: #0969da !important;
+  }
+
+  .fit {
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+
+  .page-title {
+    max-width: 540px;
+  }
+
+  .center {
+    margin: auto;
+  }
+
+  .menu-background {
+    background-color: white;
+  }
+
+  .menu .separator:first-of-type {
+    margin-top: 18px;
+  }
+  
+  .menu .separator {
+    margin-top: 30px;
+  }
+  
+  .menu .separator:last-of-type {
+    margin-top: 16px;
+  }
+
+  .index-link {
+    display: block;
+    padding: 2px 0;
+    white-space: pre;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: currentColor;
+    font-size: small;
+  }
