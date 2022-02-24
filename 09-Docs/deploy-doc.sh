@@ -1,8 +1,6 @@
 #! /usr/bin/env bash
 set -x
 
-cd 09-Docs
-
 make clear
 
 if [ "$1" != "" ]; then

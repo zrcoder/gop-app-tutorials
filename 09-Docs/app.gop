@@ -21,7 +21,7 @@ var Handler = &app.Handler{
 	CacheableResources: [
 		"/web/static/md",
 	],
-	Version: "v0.6",
+	Version: "v0.6.1",
 }
 
 // each document will make an anction to get markdown, so register a global handler here
